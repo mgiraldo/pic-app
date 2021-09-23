@@ -10,7 +10,7 @@ See also the [PIC data repository](https://github.com/nypl/pic-data).
 
 ## Running
 
-Populate `.env` from `env-sample`. Create a `config/database.yml` from `config/database-sample.yml`
+Populate `.env` from `env-sample`.
 
 ```
 foreman start
@@ -23,5 +23,4 @@ Original code in this repository is released under [Creative Commons CC0 1.0 Lic
 This repository includes:
 
 - [CesiumJS](https://github.com/AnalyticalGraphicsInc/cesium/) which is released under the [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0.html).
-
 - [Ruby on Rails](https://github.com/rails/rails) code which is released under the [MIT License](http://www.opensource.org/licenses/MIT).
