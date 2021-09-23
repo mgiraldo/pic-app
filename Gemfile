@@ -1,9 +1,17 @@
 source 'https://rubygems.org'
 
-ruby '2.6.8'
+ruby '2.7.4'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.2.2'
+gem 'activerecord', '~> 5.0.0'
+gem 'activemodel'
+gem 'actionpack'
+gem 'actionview'
+gem 'actionmailer'
+gem 'activejob'
+gem 'activesupport'
+gem 'railties'
+gem 'sprockets-rails'
 # Use sqlite3 as the database for Active Record
 gem 'pg', '~> 0.11'
 # Use SCSS for stylesheets
