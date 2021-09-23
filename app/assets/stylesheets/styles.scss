@@ -54,7 +54,7 @@ p {
 
     h1 {
         width: 1024px;
-        @include grid-shift(1);
+        // @include grid-shift(1);
         margin-bottom: .7em;
         color: $white;
         font-size: 2.5em;
@@ -62,7 +62,7 @@ p {
 
         @include media($tablet) {
             width: auto;
-            @include grid-shift(0);
+            // @include grid-shift(0);
             font-size: 1.8em;
             margin-left: 10px;
         }
@@ -105,7 +105,7 @@ p {
 
     h2 {
         // @include span-columns(11);
-        @include grid-shift(1);
+        // @include grid-shift(1);
         font-size: 2em;
         margin-top: 1em;
         margin-bottom: 1em;
@@ -128,12 +128,12 @@ p {
 #intro, #how-to, #faq, #background {
     h3 {
         // @include span-columns(10);
-        @include grid-shift(1);
+        // @include grid-shift(1);
     }
 
     p {
         // @include span-columns(10);
-        @include grid-shift(1);
+        // @include grid-shift(1);
 
         &.intro {
             // @include span-columns(10);
@@ -211,17 +211,17 @@ p {
 #faq {
     h3 {
         // @include span-columns(10);
-        @include grid-shift(1);
+        // @include grid-shift(1);
     }
 
     p {
         // @include span-columns(8);
-        @include grid-shift(2);
+        // @include grid-shift(2);
     }
 
     ul:last-of-type {
         // @include span-columns(8);
-        @include grid-shift(2);
+        // @include grid-shift(2);
         margin-bottom: 1em;
 
         li {
@@ -240,7 +240,7 @@ p {
         // @include span-columns(10);
 
         @include media($tablet) {
-            @include grid-shift(2);
+            // @include grid-shift(2);
         }
     }
 
@@ -260,12 +260,12 @@ p {
 
     p {
         // @include span-columns(9);
-        @include grid-shift(2);
+        // @include grid-shift(2);
     }
 
     blockquote {
         // @include span-columns(6);
-        @include grid-shift(3);
+        // @include grid-shift(3);
         font-family: $headerFont;
         font-size: 2em;
         line-height: 1.25em;
@@ -293,6 +293,7 @@ p {
 
 .main-nav {
     // @include row();
+    display: flex;
 
     li {
         // @include span-columns(2);
@@ -304,10 +305,10 @@ p {
         }
 
         &:first-child {
-            @include grid-shift(3 of 12);
+            // @include grid-shift(3 of 12);
 
             @include media($tablet) {
-                @include grid-shift(0);
+                // @include grid-shift(0);
             }
         }
 
