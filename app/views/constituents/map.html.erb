@@ -5,6 +5,7 @@
   <%= stylesheet_link_tag    "/assets/lib/Cesium/Widgets/widgets", :media => "all" %>
   <%= stylesheet_link_tag    "pic", :media => "all" %>
   <%= javascript_include_tag "/assets/lib/Cesium/Cesium" %>
+  <%= javascript_include_tag "/assets/lib/cesium-cartodb" %>
   <%= javascript_include_tag "/assets/lib/csvToArray.v2.1" %>
   <%= javascript_include_tag "/assets/lib/history" %>
   <%= javascript_include_tag "/assets/lib/history.adapter.native" %>
@@ -96,14 +97,12 @@
         _pic = new PIC.PIC();
         _pic.hasWebGL = webgl_detect();
         _pic.bingMapsKey = "AhboAMIjuYTcfEbws5B3G1U95fG1jFCdR6PkoxyEd9TZ-4KOL_D8Zx2ChWopl_9B";
-        _pic.tileUrl = "https://a.tiles.mapbox.com/v4/";
+        _pic.tileUrl = "https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png";
         // _pic.tileUrl = "https://dev.virtualearth.net";
         _pic.rootPath = "<%= ENV['CLOUDFRONT_URL'] %>";
         _pic.baseUrl = "<%= "#{request.protocol}#{request.host_with_port}" %>/search";
         _pic.authHeader = '<%= Base64.strict_encode64(ENV['ELASTIC_USER']+":"+ENV['ELASTIC_PASSWORD']) %>';
         _pic.geonamesUrl = "http://api.geonames.org/citiesJSON?username=mgiraldo";
-        _pic.mapboxKey = "<%= ENV['MAPBOX_KEY'] %>";
-        _pic.mapboxMap = 'nypllabs.8e20560b';
         _pic.minYear = <%= @min_year %>;
         _pic.nullIslandPath = '<%= asset_url('null-island.json') %>';
         _pic.meliesSpacePath = '<%= asset_url('melies-space.png') %>';

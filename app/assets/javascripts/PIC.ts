@@ -131,8 +131,6 @@ module PIC {
         rootPath = '';
 
         tileUrl = '';
-        mapboxKey = '';
-        mapboxMap = '';
         baseUrl = '';
         geonamesUrl = '';
         bingMapsKey = '';
@@ -368,10 +366,9 @@ module PIC {
             if (!this.hasWebGL) return
             Cesium.BingMapsApi.defaultKey = this.bingMapsKey;
             this.viewer = new Cesium.Viewer('cesiumContainer', {
-                imageryProvider: new Cesium.MapboxImageryProvider({
+                imageryProvider: new Cesium.CartoDBImageryProvider({
                     url: this.tileUrl,
-                    mapId: this.mapboxMap,
-                    accessToken: this.mapboxKey
+                    credit: 'Map tiles by Carto, under CC BY 3.0. Data by OpenStreetMap, under ODbL.'
                 })
 
                 // ,clock: new Cesium.Clock({shouldAnimate:false})

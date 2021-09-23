@@ -3285,6 +3285,21 @@ declare module Cesium {
     pickFeatures(x: number, y: number, level: number, longitude: number, latitude: number): Promise<ImageryLayerFeatureInfo[]>;
   }
 
+  class CartoDBImageryProvider {
+    url: string;
+    format: string;
+    proxy: Proxy;
+    ellipsoid: Ellipsoid;
+    maximumLevel: number;
+    minimumLevel: number;
+    rectangle: Rectangle;
+    credit: Credit;
+    constructor(options?: { url?: string; accessToken?: string; mapId?: string; proxy?: any; format?: string; rectangle?: Rectangle; minimumLevel?: number; maximumLevel?: number; ellipsoid?: Ellipsoid; credit?: Credit | string });
+    getTileCredits(x: number, y: number, level: number): Credit[];
+    requestImage(x: number, y: number, level: number): Promise<HTMLImageElement | HTMLCanvasElement>;
+    pickFeatures(x: number, y: number, level: number, longitude: number, latitude: number): Promise<ImageryLayerFeatureInfo[]>;
+  }
+
   class OpenStreetMapImageryProvider {
       url: string;
       proxy: Proxy;
@@ -4137,7 +4152,7 @@ declare module Cesium {
       allowDataSourcesToSuspendAnimation: boolean;
       trackedEntity: Entity;
       selectedEntity: Entity;
-      constructor(container: Element | string, options?: { animation?: boolean; baseLayerPicker?: boolean; fullscreenButton?: boolean; geocoder?: boolean; homeButton?: boolean; infoBox?: boolean; sceneModePicker?: boolean; selectionIndicator?: boolean; timeline?: boolean; navigationHelpButton?: boolean; navigationInstructionsInitiallyVisible?: boolean; scene3DOnly?: boolean; clock?: Clock; selectedImageryProviderViewModel?: ProviderViewModel; imageryProviderViewModels?: ProviderViewModel[]; selectedTerrainProviderViewModel?: ProviderViewModel; terrainProviderViewModels?: ProviderViewModel[]; imageryProvider?: ImageryProvider | MapboxImageryProvider | OpenStreetMapImageryProvider; terrainProvider?: TerrainProvider; skyBox?: SkyBox | boolean; skyAtmosphere?: SkyAtmosphere; fullscreenElement?: Element | string; useDefaultRenderLoop?: boolean; targetFrameRate?: number; showRenderLoopErrors?: boolean; automaticallyTrackDataSourceClocks?: boolean; contextOptions?: any; sceneMode?: SceneMode; mapProjection?: MapProjection; globe?: Globe; orderIndependentTranslucency?: boolean; creditContainer?: Element | string; dataSources?: DataSourceCollection });
+      constructor(container: Element | string, options?: { animation?: boolean; baseLayerPicker?: boolean; fullscreenButton?: boolean; geocoder?: boolean; homeButton?: boolean; infoBox?: boolean; sceneModePicker?: boolean; selectionIndicator?: boolean; timeline?: boolean; navigationHelpButton?: boolean; navigationInstructionsInitiallyVisible?: boolean; scene3DOnly?: boolean; clock?: Clock; selectedImageryProviderViewModel?: ProviderViewModel; imageryProviderViewModels?: ProviderViewModel[]; selectedTerrainProviderViewModel?: ProviderViewModel; terrainProviderViewModels?: ProviderViewModel[]; imageryProvider?: ImageryProvider | MapboxImageryProvider | OpenStreetMapImageryProvider | CartoDBImageryProvider; terrainProvider?: TerrainProvider; skyBox?: SkyBox | boolean; skyAtmosphere?: SkyAtmosphere; fullscreenElement?: Element | string; useDefaultRenderLoop?: boolean; targetFrameRate?: number; showRenderLoopErrors?: boolean; automaticallyTrackDataSourceClocks?: boolean; contextOptions?: any; sceneMode?: SceneMode; mapProjection?: MapProjection; globe?: Globe; orderIndependentTranslucency?: boolean; creditContainer?: Element | string; dataSources?: DataSourceCollection });
       extend(mixin: Viewer.ViewerMixin, options: any);
       resize();
       forceResize();
