@@ -2,6 +2,7 @@
 // -------------------------
 $fontPath:              "";
 $iconFontFamily:        "nyplicons";
+@import "variables";
 
 @mixin font-face($fontFamily, $path, $fontFilename) {
     font-family: $fontFamily;
@@ -13,7 +14,7 @@ $iconFontFamily:        "nyplicons";
 }
 
 @mixin media($width) {
-    @media screen and (min-width: $width) {
+    @media screen and (min-width: 0px) and (max-width: $mobile-breakpoint) {
         @content;
     }      
 }
