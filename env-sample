@@ -5,3 +5,6 @@ CLOUDFRONT_URL=http://[fqdn cf url]/
 MAPBOX_KEY=[mapbox key]
 PROTOCOL=https://
 RAILS_ENV=development
+GOOGLE_EMAIL=[email for feedback]
+GOOGLE_PASSWORD=[password for email]
+GOOGLE_SPREADSHEET=[spreadsheet to populate with feedback]
