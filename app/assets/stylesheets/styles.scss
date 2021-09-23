@@ -246,14 +246,18 @@ p {
 
     img {
         // @include span-columns(10);
-
+        margin-left: 20rem;
+        width: 60%;
         @include media($tablet) {
             // @include grid-shift(2);
+            width: 80%;
         }
     }
 
     .caption {
         // @include span-columns(2);
+        position: absolute;
+        width: 20rem;
         font-family: $headerFont;
         text-align: right;
         font-size: .8em;
