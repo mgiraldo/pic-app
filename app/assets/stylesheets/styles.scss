@@ -4,7 +4,7 @@
 @import "variables";
 @import "grid-settings";
 
-@include keyframes(starwars) {
+@keyframes starwars {
   0% {
     background-position: 50% 300%;
   }
@@ -50,11 +50,11 @@ p {
     display: flex;
     align-items: flex-end;
 
-    @include animation(starwars 3s .2s forwards);
+    animation: starwars 3s .2s forwards;
 
     h1 {
         width: 1024px;
-        @include shift(1);
+        @include grid-shift(1);
         margin-bottom: .7em;
         color: $white;
         font-size: 2.5em;
@@ -62,7 +62,7 @@ p {
 
         @include media($tablet) {
             width: auto;
-            @include shift(0);
+            @include grid-shift(0);
             font-size: 1.8em;
             margin-left: 10px;
         }
@@ -82,7 +82,7 @@ p {
     clear: both;
     // @include box-shadow(0, 0, 0px, 0, $linkColor);
 
-    @include transition(all, .1s);
+    transition: all .1s;
 
     @include media($tablet) {
         width: 300px;
@@ -104,8 +104,8 @@ p {
     @include outer-container;
 
     h2 {
-        @include span-columns(11);
-        @include shift(1);
+        // @include span-columns(11);
+        @include grid-shift(1);
         font-size: 2em;
         margin-top: 1em;
         margin-bottom: 1em;
@@ -127,16 +127,16 @@ p {
 
 #intro, #how-to, #faq, #background {
     h3 {
-        @include span-columns(10);
-        @include shift(1);
+        // @include span-columns(10);
+        @include grid-shift(1);
     }
 
     p {
-        @include span-columns(10);
-        @include shift(1);
+        // @include span-columns(10);
+        @include grid-shift(1);
 
         &.intro {
-            @include span-columns(10);
+            // @include span-columns(10);
             font-size: 1.2em;
             line-height: 1.75em;
             margin-top: 1em;
@@ -155,16 +155,16 @@ p {
 
 #samples {
     .cases {
-        @include span-columns(10);
-        @include shift(1);
+        // @include span-columns(10);
+        @include grid-shift(1);
 
         .use-case {
-            @include span-columns(5 of 10);
-            @include omega(2n);
+            // @include span-columns(5 of 10);
+            // @include omega(2n);
             margin-bottom: 3em;
 
             @include media($tablet) {
-                @include span-columns(10 of 10);
+                // @include span-columns(10 of 10);
                 font-size: 0.8em;
                 line-height: 1.5em;
             }
@@ -186,7 +186,7 @@ p {
                 clear: both;
                 // @include box-shadow(0, 0, 0px, 0, $linkColor);
 
-                @include transition(all, .1s);
+                transition: all .1s;
 
                 @include media($tablet) {
                     width: 240px;
@@ -210,18 +210,18 @@ p {
 
 #faq {
     h3 {
-        @include span-columns(10);
-        @include shift(1);
+        // @include span-columns(10);
+        @include grid-shift(1);
     }
 
     p {
-        @include span-columns(8);
-        @include shift(2);
+        // @include span-columns(8);
+        @include grid-shift(2);
     }
 
     ul:last-of-type {
-        @include span-columns(8);
-        @include shift(2);
+        // @include span-columns(8);
+        @include grid-shift(2);
         margin-bottom: 1em;
 
         li {
@@ -232,20 +232,20 @@ p {
 
 #background {
     .figure {
-        @include span-columns(12);
+        // @include span-columns(12);
         margin-bottom: 1em;
     }
 
     img {
-        @include span-columns(10);
+        // @include span-columns(10);
 
         @include media($tablet) {
-            @include shift(2);
+            @include grid-shift(2);
         }
     }
 
     .caption {
-        @include span-columns(2);
+        // @include span-columns(2);
         font-family: $headerFont;
         text-align: right;
         font-size: .8em;
@@ -254,18 +254,18 @@ p {
         padding-top: 1em;
 
         @include media($tablet) {
-            @include span-columns(6);
+            // @include span-columns(6);
         }
     }
 
     p {
-        @include span-columns(9);
-        @include shift(2);
+        // @include span-columns(9);
+        @include grid-shift(2);
     }
 
     blockquote {
-        @include span-columns(6);
-        @include shift(3);
+        // @include span-columns(6);
+        @include grid-shift(3);
         font-family: $headerFont;
         font-size: 2em;
         line-height: 1.25em;
@@ -288,26 +288,26 @@ p {
 }
 
 .main-header, .footer {
-    @include span-columns(12);
+    // @include span-columns(12);
 }
 
 .main-nav {
-    @include row();
+    // @include row();
 
     li {
-        @include span-columns(2);
+        // @include span-columns(2);
         border-radius: 0 0 6px 6px;
         text-align: center;
 
         @include media($tablet) {
-            @include span-columns(1 of 3);
+            // @include span-columns(1 of 3);
         }
 
         &:first-child {
-            @include shift(3 of 12);
+            @include grid-shift(3 of 12);
 
             @include media($tablet) {
-                @include shift(0);
+                @include grid-shift(0);
             }
         }
 
@@ -361,8 +361,8 @@ header {
     color: $darkGray;
     padding: 8px;
     display: flex;
-    @include flex-direction(row);
-    @include align-items(center);
+    flex-direction: row;
+    align-items: center;
     border-top: 2px solid $nyplRed;
 
     @include media($tablet) {
@@ -461,7 +461,7 @@ header {
         }
     }
 
-    @include transition(all, .2s, ease-out);
+    transition: all .2s ease-out;
 
     &.open {
         right: 0;

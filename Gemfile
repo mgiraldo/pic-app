@@ -52,7 +52,7 @@ gem 'google-api-client'#, '~> 0.7.0'
 gem 'useragent'
 
 gem 'bourbon'
-gem 'neat', '1.7.1'
+gem 'neat', '4.0.0'
 gem 'typescript-rails'
 
 gem 'rails_12factor', group: :production

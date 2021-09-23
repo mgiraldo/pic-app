@@ -12,6 +12,19 @@ $iconFontFamily:        "nyplicons";
         asset-url('#{$path}#{$fontFilename}.ttf') format('truetype');
 }
 
+@mixin media($width) {
+    @media screen and (min-width: $width) {
+        @content;
+    }      
+}
+
+@mixin outer-container() {
+    @include grid-container;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 1200px;
+}
+
 @font-face {
   @include font-face($iconFontFamily, $fontPath, 'icomoon');
   font-weight: normal;

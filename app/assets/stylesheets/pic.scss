@@ -133,9 +133,9 @@ hr {
     right: 0;
     bottom: 0;
 
-    @include transition-property(all);
-    @include transition-duration(0.2s);
-    @include transition-timing-function(ease-in);
+    transition-property: all;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in;
 
     @media screen and (min-width: 0px) and (max-width: $mobile-breakpoint) {
     }
@@ -164,19 +164,18 @@ hr {
     top: $headerHeight;//$generalMargin;
     left: 0;//$generalMargin;
     bottom: 0;
-    @include display(flex);
-    @include flex-direction(column);
+    display: flex;
+    flex-direction: column;
     // padding-right: $generalMargin;
     // border-radius: 3px;
 
-    @include transition-property(all);
-    @include transition-duration(0.2s);
-    @include transition-timing-function(ease-in);
+    transition-property: all;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in;
 
     #facets {
         overflow-y: scroll;
         -webkit-overflow-scrolling: touch;
-        @include flex(auto);
         flex: auto;
 
         h4 {
@@ -210,9 +209,9 @@ hr {
     border-radius: 0px;
     // text-transform: uppercase;
 
-    @include transition-property(left);
-    @include transition-duration(0.2s);
-    @include transition-timing-function(ease-in);
+    transition-property: left;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in;
 
     &.minimized {
         left: $generalMargin;
@@ -249,9 +248,9 @@ hr {
     background-color: transparentize($black, .25);
     padding: $generalMargin;
 
-    @include transition-property(all);
-    @include transition-duration(0.2s);
-    @include transition-timing-function(ease-in);
+    transition-property: all;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in;
 
     &.minimized {
         left: $generalMargin + $minimizedWidth + $generalMargin;
@@ -384,9 +383,9 @@ hr {
         max-height: 0;
         opacity: 0;
         overflow: hidden;
-        @include transition-property(all);
-        @include transition-duration(0.15s);
-        @include transition-timing-function(ease-in);
+        transition-property: all;
+        transition-duration: 0.15s;
+        transition-timing-function: ease-in;
 
         &.open {
             opacity: 1;
@@ -472,9 +471,9 @@ hr {
     border-left: 1px solid $black;
     padding: $generalMargin;
 
-    @include transition-property(all);
-    @include transition-duration(0.2s);
-    @include transition-timing-function(ease-in);
+    transition-property: all;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in;
 
     strong {
         font-family: $headerFont;
