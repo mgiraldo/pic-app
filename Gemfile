@@ -3,8 +3,6 @@ source 'https://rubygems.org'
 ruby '2.7.4'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'activerecord', '~> 5.0.0'
-gem 'activemodel'
 gem 'actionpack'
 gem 'actionview'
 gem 'actionmailer'

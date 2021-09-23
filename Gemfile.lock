@@ -260,8 +260,6 @@ DEPENDENCIES
   actionpack
   actionview
   activejob
-  activemodel
-  activerecord (~> 5.0.0)
   activesupport
   bourbon
   byebug
