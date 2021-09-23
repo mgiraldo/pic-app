@@ -6,6 +6,10 @@
  * http://meyerweb.com/eric/tools/css/reset
  */
 
+body * {
+  box-sizing: border-box;
+}
+
 html,
 body,
 div,

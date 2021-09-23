@@ -329,7 +329,7 @@ hr {
 }
 
 #facets {
-    margin: $generalMargin;
+    padding: $generalMargin;
 
     label {
         display: block;
@@ -353,7 +353,7 @@ hr {
     span, .text {
         font-size: 1em;
         font-family: $bodyFont;
-        width: 100%;
+        width: 90%;
         padding: $facetMargin;
     }
 
@@ -457,8 +457,9 @@ hr {
 .scroller {
     width: 100%;
     height: 100%;
-    overflow-y: scroll;
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    padding: $generalMargin;
 }
 
 #constituents {
@@ -469,7 +470,6 @@ hr {
     top: $headerHeight;
     bottom: 0;
     border-left: 1px solid $black;
-    padding: $generalMargin;
 
     transition-property: all;
     transition-duration: 0.2s;
