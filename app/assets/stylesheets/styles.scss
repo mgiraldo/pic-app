@@ -156,12 +156,16 @@ p {
 #samples {
     .cases {
         // @include span-columns(10);
-        @include grid-shift(1);
+        // @include grid-shift(1);
+        display: flex;
+        flex-wrap: wrap;
 
         .use-case {
             // @include span-columns(5 of 10);
             // @include omega(2n);
             margin-bottom: 3em;
+            max-width: 45%;
+            margin-right: 2%;
 
             @include media($tablet) {
                 // @include span-columns(10 of 10);
@@ -228,6 +232,10 @@ p {
             list-style: disc;
         }
     }
+}
+
+.faq-contents {
+    margin: 1rem 5rem;
 }
 
 #background {
@@ -314,6 +322,7 @@ p {
 
         &.samples {
             background-color: lighten($bornColor, 20%);
+            margin-left: auto;
         }
 
         &.faq {
@@ -322,6 +331,7 @@ p {
 
         &.background {
             background-color: lighten($bizColor, 20%);
+            margin-right: auto;
         }
 
         a {
