@@ -839,7 +839,7 @@ module PIC {
             // url = url + "&from="+from;
             // url = url + "&_source="+source;
             // url = url + "&_source_exclude="+exclude;
-            // console.log("elastic", url, JSON.stringify(data));
+            // console.log(data);
             var pic = this;
 
             var r = new XMLHttpRequest();
@@ -853,6 +853,7 @@ module PIC {
                 if (r.readyState != 4 || r.status != 200) return;
                 // console.log("result", r.responseText);
                 var res = JSON.parse(r.responseText)
+                // console.log("res", res);
                 if (parameter === undefined) {
                     callback.apply(pic, [res]);
                 } else {
@@ -1021,7 +1022,10 @@ module PIC {
 
             if (hasNestedFilter) {
                 if (type === "child") {
-                    data["query"]["bool"]["filter"] = nestedFilter
+                    nestedQuery[filterType]["query"]["bool"]["filter"] = nestedFilter
+                    data = {
+                        "query": nestedQuery
+                    }
                 } else {
                     data["query"]["bool"]["must"].push(nestedQuery)
                     data["query"]["bool"]["filter"] = nestedFilter
@@ -2112,7 +2116,6 @@ module PIC {
             } else {
                 $("#facets-clear").removeClass("disabled");
             }
-            var addresses = [];
             var data = this.buildFacetQuery(undefined, "parent");
             var filters = "hits.total,hits.hits,aggregations";
             this.start = new Date().getTime();
