@@ -789,7 +789,7 @@ module PIC {
             // constituent aggs
             var data = this.buildElasticQuery(["ConstituentID:*"], ["*"], "parent")
             this.getData({
-                filters: filters, data: data, docType: "address", sort: "", source: "", size: 0, callback: function (results) {
+                filters: filters, data: data, sort: "", source: "", size: 0, callback: function (results) {
                     if (results.aggregations) {
                         this.applyAggregations(results.aggregations)
                     }
@@ -871,26 +871,6 @@ module PIC {
                 "source_exclude": exclude
             }
             r.send(JSON.stringify(req));
-        }
-
-        parseInnerHits(results) {
-            var parsed = {
-                hits: {
-                    total: results.hits.total,
-                    hits: []
-                }
-            }
-            for (var hit in results.hits.hits) {
-                var tmp = {
-                    _source: results.hits.hits[hit]._source
-                }
-                if (results.hits.hits[hit].inner_hits != undefined) {
-                    // console.log(results.hits.hits[hit])
-                    tmp._source.address = results.hits.hits[hit].inner_hits.address.hits.hits.map(a => a._source)
-                }
-                parsed.hits.hits.push(tmp)
-            }
-            return parsed
         }
 
         buildAggregations(type: string) {
@@ -1040,14 +1020,15 @@ module PIC {
         }
 
         makeEmptyQuery(type: string) {
-            var filter = "has_child", value = "address"
+            var filter = "has_child", value = "address", hasType = "type"
             if (type === "parent") {
                 filter = "has_parent"
                 value = "constituent"
+                hasType = "parent_type"
             }
             var query = {}
             query[filter] = {
-                "type": value,
+                [hasType]: value,
                 "query": {
                     "bool": {
                         "must": []
@@ -1399,7 +1380,7 @@ module PIC {
             if (this.pickedEntity === undefined) return;
             var position = this.pickedEntity.entity.primitive.originalLatlon;
             // console.log("hover", data);
-            var hits = data.hits.total;
+            var hits = data.hits.total.value;
             var str = "<div>";
             str += '<span class="hits">' + hits.toLocaleString() + '</span>';
             str += hits === 1 ? " constituent" : " total constituents";
@@ -1517,7 +1498,7 @@ module PIC {
                 this.applyAggregations(data.aggregations)
             }
             var constituents = data.hits.hits;
-            var total = data.hits.total;
+            var total = data.hits.total.value;
             this.totalPhotographers = total;
             var str = "<p>Found " + this.totalPhotographers.toLocaleString() + (this.totalPhotographers != 1 ? " constituents. " : " constituent. ");
             if (total > this.resultLimit) {
@@ -1532,7 +1513,7 @@ module PIC {
             str = str + '<span class="export-links">' + exportStr + ': <a href="' + url + '" target="_blank" title="opens in new window" class="export link">JSON</a> | <a href="' + urlGeo + '" target="_blank" title="open dataset in GeoJSON.io" class="export link">GeoJSON</a></span>';
             str = str + "</p>";
             this.resultsElement.find(".results").prepend(str);
-            if (total > 0) this.addResults(constituents, 0, data.hits.total);
+            if (total > 0) this.addResults(constituents, 0, data.hits.total.value);
             this.updateTotals(-1);
             // // now to see if a line should be shown
             var lineID = parseInt(location.hash.replace("#", ""));
@@ -1570,8 +1551,8 @@ module PIC {
                     var scroll = $("#constituents .scroller").scrollTop();
                     var height = $("#constituents .scroller").height();
                     var constituents = data.hits.hits;
-                    this.totalPhotographers = data.hits.total;
-                    this.addResults(constituents, start, data.hits.total);
+                    this.totalPhotographers = data.hits.total.value;
+                    this.addResults(constituents, start, data.hits.total.value);
                     this.scrollResults(scroll + height - 100);
                 }, source: "", size: this.resultLimit, exclude: "address", from: start
             });
@@ -1731,7 +1712,7 @@ module PIC {
             // change url without commiting new state change
             var filters = "hits.total,hits.hits";
             var data = this.buildElasticQuery(["ConstituentID:" + id, "address.ConstituentID:" + id], ["*"], "parent");
-            this.getData({ filters: filters, data: data, callback: this.parseConstituentAddresses, source: "", docType: "address", size: this.elasticSize, exclude: "", sort: "", from: 0, parameter: id });
+            this.getData({ filters: filters, data: data, callback: this.parseConstituentAddresses, source: "", size: this.elasticSize, exclude: "", sort: "", from: 0, parameter: id });
         }
 
         parseConstituentAddresses(data, id) {
@@ -1911,7 +1892,7 @@ module PIC {
                     html += data.hits.hits[0]._source.DisplayName
                     html += '</div>'
                     $("#total-points").append(html)
-                }, source: "DisplayName", docType: "constituent", size: 1, exclude: "", sort: "", from: 0
+                }, source: "DisplayName", size: 1, exclude: "", sort: "", from: 0
             })
         }
 
@@ -2134,7 +2115,7 @@ module PIC {
             if (facetList.length === 0) {
                 this.displayBaseData();
             } else {
-                this.getData({ filters: filters, data: data, callback: this.getNextSet, docType: "address", sort: "_uid", source: "ConAddressID" });
+                this.getData({ filters: filters, data: data, callback: this.getNextSet, sort: "", source: "ConAddressID" });
             }
             this.updateTotals(-1);
         }
@@ -2164,12 +2145,12 @@ module PIC {
             if (results.aggregations) {
                 this.applyAggregations(results.aggregations)
             }
-            if (results.hits.total > this.elasticResults.from + this.elasticSize) {
+            if (results.hits.total.value > this.elasticResults.from + this.elasticSize) {
                 // keep going
                 var data = this.elasticResults.data;
                 this.elasticResults.from += this.elasticSize;
                 var filters = this.elasticResults.filters;
-                this.getData({ filters: filters, data: data, callback: this.getNextSet, docType: "address", sort: "_uid", source: "ConAddressID", size: this.elasticSize, exclude: "", from: 0, after: ["address#" + results.hits.hits[results.hits.hits.length - 1]._id] });
+                this.getData({ filters: filters, data: data, callback: this.getNextSet, sort: "", source: "ConAddressID", size: this.elasticSize, exclude: "", from: 0, after: ["address#" + results.hits.hits[results.hits.hits.length - 1]._id] });
             } else {
                 var end = new Date().getTime();
                 var time = end - this.start;
@@ -2178,7 +2159,7 @@ module PIC {
                 this.showResults();
             }
             if (results.hits.hits) this.addressesToPoints(results.hits.hits);
-            if (results.hits.total <= this.elasticResults.from + this.elasticSize) {
+            if (results.hits.total.value <= this.elasticResults.from + this.elasticSize) {
                 this.updateBounds();
             }
             this.updateTotals(-1);

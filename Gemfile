@@ -43,7 +43,7 @@ gem 'markdown-rails', '1.0.0'
 
 gem 'responders', '~> 2.0'
 
-gem 'elasticsearch', '5.0.4'
+gem 'elasticsearch', '~> 7.15'
 
 gem 'google_drive', '1.0.2'
 gem 'google-api-client'#, '~> 0.7.0'
