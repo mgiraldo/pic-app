@@ -70,7 +70,7 @@ class ConstituentsController < ApplicationController
     # puts "\n\n\n\n\n"
     # puts params
     # puts "\n\n\n\n\n"
-    begin
+    # begin
       p = params
       q = p[:q]
       filter_path = p[:filter_path]
@@ -80,10 +80,11 @@ class ConstituentsController < ApplicationController
       type = p[:docType]
       exclude = p[:source_exclude]
       sort = p[:sort]
+      puts q
       r = client.search index: 'pic', type: type, body: q, size: size, from: from, sort: sort, _source: source, _source_exclude: exclude, filter_path: filter_path
-    rescue
-      @results = nil
-    end
+    # rescue
+    #   @results = nil
+    # end
     # puts "QUERY:"
     # puts q
     @results = r

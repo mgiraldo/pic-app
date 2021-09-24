@@ -82,8 +82,11 @@ $iconFontFamily:        "nyplicons";
     transition: all 0.2s;
 
     &:hover {
-      background: $color;
-      color: $backgroundColor;
+        background: $color;
+        
+        &:not(.disabled){ 
+            color: $backgroundColor;
+        }
     }
 }
 

@@ -21,56 +21,58 @@ module PIC {
     }
 
     export class StoredView {
-            position = undefined;
-            heading = undefined;
-            pitch = undefined;
-            roll = undefined;
-            transform = undefined;
+        position = undefined;
+        heading = undefined;
+        pitch = undefined;
+        roll = undefined;
+        transform = undefined;
 
-            save (camera:Cesium.Camera) {
-                if(typeof camera === 'undefined') {
-                    throw new Cesium.DeveloperError('camera is required');
-                }
-
-                this.position = Cesium.Cartesian3.clone(camera.positionWC, this.position);
-                this.heading = camera.heading;
-                this.pitch = camera.pitch;
-                this.roll = camera.roll;
-                this.transform = Cesium.Matrix4.clone(camera.transform, this.transform);
+        save(camera: Cesium.Camera) {
+            if (typeof camera === 'undefined') {
+                throw new Cesium.DeveloperError('camera is required');
             }
 
-            load (camera:Cesium.Camera) {
-                if(typeof this.position === 'undefined') {
-                    throw new Cesium.DeveloperError('no view has been stored');
-                }
+            this.position = Cesium.Cartesian3.clone(camera.positionWC, this.position);
+            this.heading = camera.heading;
+            this.pitch = camera.pitch;
+            this.roll = camera.roll;
+            this.transform = Cesium.Matrix4.clone(camera.transform, this.transform);
+        }
 
-                camera.position = Cesium.Cartesian3.clone(this.position, camera.position);
-                camera.heading = this.heading;
-                camera.pitch = this.pitch;
-                camera.roll = this.roll;
-                camera.transform = Cesium.Matrix4.clone(this.transform, camera.transform);
+        load(camera: Cesium.Camera) {
+            if (typeof this.position === 'undefined') {
+                throw new Cesium.DeveloperError('no view has been stored');
             }
+
+            camera.position = Cesium.Cartesian3.clone(this.position, camera.position);
+            camera.heading = this.heading;
+            camera.pitch = this.pitch;
+            camera.roll = this.roll;
+            camera.transform = Cesium.Matrix4.clone(this.transform, camera.transform);
+        }
     }
 
     export class PIC {
-        viewer : Cesium.Viewer;
-        scene : Cesium.Scene;
-        camera : Cesium.Camera;
-        lastCameraViewMatrix : Cesium.Matrix4 = new Cesium.Matrix4();
+        viewer: Cesium.Viewer;
+        scene: Cesium.Scene;
+        camera: Cesium.Camera;
+        bboxDiv: any = document.getElementById("bbox-div");
+
+        lastCameraViewMatrix: Cesium.Matrix4 = new Cesium.Matrix4();
         lastCameraMoveTime = 0;
         verboseRendering = true;
         stoppedRendering = false;
         canvas;
         points;
         handler;
-        elasticResults : ElasticResults = {data: {}, from: 0, hits:[], total:0, filters:""};
+        elasticResults: ElasticResults = { data: {}, from: 0, hits: [], total: 0, filters: "" };
         pointArray = [];
         pointHash = {}; // contains the index to a given id in the pointArray
         latlonHeightHash = {};
         heightHash = {};
         allIDs = [];
         lines;
-        hasWebGL:boolean = false
+        hasWebGL: boolean = false
 
         storedView: StoredView = new StoredView();
 
@@ -101,18 +103,18 @@ module PIC {
         boundsPrimitive: Cesium.Primitive;
         isDrawing = false;
         isPenDown = false;
-        spaceLayer : Cesium.ImageryLayer;
-        moonLayer : Cesium.ImageryLayer;
-        spaceCircle : Cesium.Primitive;
-        moonCircle : Cesium.Primitive;
-        textLabels : Cesium.LabelCollection;
+        spaceLayer: Cesium.ImageryLayer;
+        moonLayer: Cesium.ImageryLayer;
+        spaceCircle: Cesium.Primitive;
+        moonCircle: Cesium.Primitive;
+        textLabels: Cesium.LabelCollection;
 
         minYear = 0;
         maxYear = new Date().getFullYear();
         spaceHeight = 400000;
         moonHeight = 3850000;
-        spaceRadius =  850000.0;
-        moonRadius =  700000.0;
+        spaceRadius = 850000.0;
+        moonRadius = 700000.0;
 
         debug = false;
 
@@ -148,7 +150,7 @@ module PIC {
         fromDateElement = "fromDate";
         toDateElement = "toDate";
 
-        facets : string[][] = [
+        facets: string[][] = [
             ["addresstypes", "Type", "AddressTypeID", "AddressType", "address"],
             ["countries", "Country", "CountryID", "Country", "address"],
             ["bbox", "In Map Area", "bbox", "", ""],
@@ -167,9 +169,9 @@ module PIC {
         filters = {};
         facetWidgets: FacetMap = {};
 
-        start : number;
+        start: number;
 
-        historyState : HistoryState;
+        historyState: HistoryState;
 
         selectedColor = new Cesium.Color(1, 1, 0.2, 1);
         bizColor = new Cesium.Color(1, 0.50, 0.01, 1);
@@ -190,7 +192,7 @@ module PIC {
         constructor() {
         }
 
-        processStateChange () {
+        processStateChange() {
             this.notifyRepaintRequired();
             this.historyState = Historyjs.getState();
 
@@ -204,7 +206,7 @@ module PIC {
                 return;
             }
 
-            var filterString = decodeURI(this.historyState.hash.substr(this.historyState.hash.lastIndexOf("/")+2));
+            var filterString = decodeURI(this.historyState.hash.substr(this.historyState.hash.lastIndexOf("/") + 2));
 
             if (filterString.lastIndexOf("#") !== -1) filterString = filterString.substring(0, filterString.lastIndexOf("#"));
 
@@ -255,7 +257,7 @@ module PIC {
                             var south = Number(eswnArray[1]);
                             var east = Number(eswnArray[2]);
                             var north = Number(eswnArray[3]);
-                            var bbox = [Cesium.Cartographic.fromDegrees(north,west), Cesium.Cartographic.fromDegrees(south,east)];
+                            var bbox = [Cesium.Cartographic.fromDegrees(north, west), Cesium.Cartographic.fromDegrees(south, east)];
                             this.setBboxWidget(bbox);
                             this.drawBounds(north, south, east, west);
                         }
@@ -332,7 +334,7 @@ module PIC {
             window.onclick = _bindRepaint;
             this.showSpinner(this.resultsElement);
             if (!this.hasWebGL) return
-            this.scene.postRender.addEventListener( (e) => {this.postRender()} );
+            this.scene.postRender.addEventListener((e) => { this.postRender() });
             this.canvas.addEventListener('mousemove', _bindRepaint, false);
             this.canvas.addEventListener('mousedown', _bindRepaint, false);
             this.canvas.addEventListener('mouseup', _bindRepaint, false);
@@ -354,15 +356,15 @@ module PIC {
             this.canvas.addEventListener(_wheelEvent, _bindRepaint, false);
         }
 
-        toggleHelp () {
+        toggleHelp() {
             $("#map-help").fadeToggle();
         }
 
-        resetBounds () {
+        resetBounds() {
             this.bounds = [-180, -90, 180, 90];
         }
 
-        initWorld () {
+        initWorld() {
             if (!this.hasWebGL) return
             Cesium.BingMapsApi.defaultKey = this.bingMapsKey;
             this.viewer = new Cesium.Viewer('cesiumContainer', {
@@ -373,18 +375,18 @@ module PIC {
 
                 // ,clock: new Cesium.Clock({shouldAnimate:false})
                 // ,geocoder: false
-                ,baseLayerPicker: false
-                ,homeButton : false
-                ,infoBox : false
-                ,timeline : false
-                ,animation : false
-                ,navigationHelpButton : false
-                ,navigationInstructionsInitiallyVisible : false
-                ,mapProjection : new Cesium.WebMercatorProjection()
+                , baseLayerPicker: false
+                , homeButton: false
+                , infoBox: false
+                , timeline: false
+                , animation: false
+                , navigationHelpButton: false
+                , navigationInstructionsInitiallyVisible: false
+                , mapProjection: new Cesium.WebMercatorProjection()
                 // ,creditContainer : "credits"
-                ,selectionIndicator : false
-                ,skyBox : false
-                ,sceneMode : Cesium.SceneMode.SCENE2D
+                , selectionIndicator: false
+                , skyBox: false
+                , sceneMode: Cesium.SceneMode.SCENE2D
             });
 
             this.scene = this.viewer.scene;
@@ -407,18 +409,18 @@ module PIC {
 
             this.points = this.scene.primitives.add(new Cesium.PointPrimitiveCollection());
             this.points._rs = Cesium.RenderState.fromCache({
-              depthTest : {
-                enabled : true
-              },
-              depthMask : false,
-              blending : Cesium.BlendingState.ADDITIVE_BLEND
+                depthTest: {
+                    enabled: true
+                },
+                depthMask: false,
+                blending: Cesium.BlendingState.ADDITIVE_BLEND
             });
 
             this.lines = new Cesium.Primitive();
             this.scene.primitives.add(this.lines);
 
             this.boundsSelectionEntity = new Cesium.Entity();
-            this.boundsSelectionEntity.rectangle = this.makeBoundsRect(Cesium.Cartographic.fromDegrees(0,0),Cesium.Cartographic.fromDegrees(0.1,0.1));
+            this.boundsSelectionEntity.rectangle = this.makeBoundsRect(Cesium.Cartographic.fromDegrees(0, 0), Cesium.Cartographic.fromDegrees(0.1, 0.1));
             this.viewer.entities.add(this.boundsSelectionEntity);
             this.boundsSelectionEntity.show = false;
 
@@ -426,7 +428,7 @@ module PIC {
             this.scene.primitives.add(this.boundsPrimitive);
         }
 
-        showMoon () {
+        showMoon() {
             // this.spaceLayer = new Cesium.Primitive({
             //     geometryInstances: new Cesium.GeometryInstance({
             //         geometry: new Cesium.RectangleGeometry({
@@ -462,21 +464,21 @@ module PIC {
 
             this.viewer.imageryLayers.remove(this.moonLayer);
             this.moonLayer = this.viewer.imageryLayers.addImageryProvider(new Cesium.SingleTileImageryProvider({
-                url : this.meliesMoonPath,
-                rectangle : Cesium.Rectangle.fromDegrees(-122.4190541, -48.4356558, -93.1480924, -31.0020460)
+                url: this.meliesMoonPath,
+                rectangle: Cesium.Rectangle.fromDegrees(-122.4190541, -48.4356558, -93.1480924, -31.0020460)
             }));
 
             this.viewer.imageryLayers.remove(this.spaceLayer);
             this.spaceLayer = this.viewer.imageryLayers.addImageryProvider(new Cesium.SingleTileImageryProvider({
-                url : this.meliesSpacePath,
-                rectangle : Cesium.Rectangle.fromDegrees(-122.4190541, -48.4356558, -93.1480924, -31.0020460)
+                url: this.meliesSpacePath,
+                rectangle: Cesium.Rectangle.fromDegrees(-122.4190541, -48.4356558, -93.1480924, -31.0020460)
             }));
 
             this.moonLayer.alpha = 0.5;
             this.spaceLayer.alpha = 0.75;
         }
 
-        hideMoon () {
+        hideMoon() {
             // this.scene.primitives.remove(this.spaceLayer);
             // this.scene.primitives.remove(this.moonLayer);
             this.viewer.imageryLayers.remove(this.moonLayer);
@@ -494,7 +496,7 @@ module PIC {
             console.log(lat, lon);
         }
 
-        showSpaceFloatingPrimitives () {
+        showSpaceFloatingPrimitives() {
             this.scene.primitives.remove(this.spaceCircle);
             this.scene.primitives.remove(this.moonCircle);
 
@@ -510,24 +512,24 @@ module PIC {
             // the space outline
 
             var spaceCircle = new Cesium.CircleOutlineGeometry({
-                center : Cesium.Cartesian3.fromDegrees(centerx, centery),
-                radius : this.spaceRadius,
-                height : this.spaceHeight
+                center: Cesium.Cartesian3.fromDegrees(centerx, centery),
+                radius: this.spaceRadius,
+                height: this.spaceHeight
             });
 
             var spaceGeometry = Cesium.CircleOutlineGeometry.createGeometry(spaceCircle);
 
             this.spaceCircle = new Cesium.Primitive({
                 geometryInstances: new Cesium.GeometryInstance({
-                geometry: spaceGeometry,
-                attributes: {
-                    color: Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.WHITE.withAlpha(0.5))
-                }
-            }),
+                    geometry: spaceGeometry,
+                    attributes: {
+                        color: Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.WHITE.withAlpha(0.5))
+                    }
+                }),
                 appearance: new Cesium.PerInstanceColorAppearance({
-                    flat : true,
-                    renderState : {
-                        lineWidth : Math.min(2.0, this.scene.maximumAliasedLineWidth)
+                    flat: true,
+                    renderState: {
+                        lineWidth: Math.min(2.0, this.scene.maximumAliasedLineWidth)
                     }
                 }),
                 releaseGeometryInstances: false
@@ -537,24 +539,24 @@ module PIC {
 
             // the moon outline
             var moonCircle = new Cesium.CircleOutlineGeometry({
-                center : Cesium.Cartesian3.fromDegrees(centerx, centery),
-                radius : this.moonRadius,
-                height : this.moonHeight
+                center: Cesium.Cartesian3.fromDegrees(centerx, centery),
+                radius: this.moonRadius,
+                height: this.moonHeight
             });
 
             var moonGeometry = Cesium.CircleOutlineGeometry.createGeometry(moonCircle);
 
             this.moonCircle = new Cesium.Primitive({
                 geometryInstances: new Cesium.GeometryInstance({
-                geometry: moonGeometry,
-                attributes: {
-                    color: Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.WHITE.withAlpha(0.5))
-                }
-            }),
+                    geometry: moonGeometry,
+                    attributes: {
+                        color: Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.WHITE.withAlpha(0.5))
+                    }
+                }),
                 appearance: new Cesium.PerInstanceColorAppearance({
-                    flat : true,
-                    renderState : {
-                        lineWidth : Math.min(2.0, this.scene.maximumAliasedLineWidth)
+                    flat: true,
+                    renderState: {
+                        lineWidth: Math.min(2.0, this.scene.maximumAliasedLineWidth)
                     }
                 }),
                 releaseGeometryInstances: false
@@ -565,7 +567,7 @@ module PIC {
             this.notifyRepaintRequired();
         }
 
-        updateTextLabels () {
+        updateTextLabels() {
             var xmin = -111.0687;
             var xmax = -101.8181;
             var dx = xmax - xmin;
@@ -576,19 +578,19 @@ module PIC {
 
             if (this.scene.mode !== 2) {
                 this.textLabels.add({
-                    position : Cesium.Cartesian3.fromDegrees(centerx, ymax+3, this.spaceHeight),
-                    text     : 'Outer Space',
-                    font : '20px sans-serif',
-                    horizontalOrigin : Cesium.HorizontalOrigin.LEFT,
-                    translucencyByDistance : new Cesium.NearFarScalar(1.5e2, 1.0, 1.5e8, 0.1)
+                    position: Cesium.Cartesian3.fromDegrees(centerx, ymax + 3, this.spaceHeight),
+                    text: 'Outer Space',
+                    font: '20px sans-serif',
+                    horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
+                    translucencyByDistance: new Cesium.NearFarScalar(1.5e2, 1.0, 1.5e8, 0.1)
                 });
 
                 this.textLabels.add({
-                    position : Cesium.Cartesian3.fromDegrees(centerx, ymax+1, this.moonHeight),
-                    text     : 'The Moon!',
-                    font : '20px sans-serif',
-                    horizontalOrigin : Cesium.HorizontalOrigin.LEFT,
-                    translucencyByDistance : new Cesium.NearFarScalar(1.5e2, 1.0, 1.5e8, 0.1)
+                    position: Cesium.Cartesian3.fromDegrees(centerx, ymax + 1, this.moonHeight),
+                    text: 'The Moon!',
+                    font: '20px sans-serif',
+                    horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
+                    translucencyByDistance: new Cesium.NearFarScalar(1.5e2, 1.0, 1.5e8, 0.1)
                 });
             }
 
@@ -603,15 +605,15 @@ module PIC {
             this.notifyRepaintRequired();
         }
 
-        imageAppearance (imagePath: string) {
+        imageAppearance(imagePath: string) {
             return new Cesium.EllipsoidSurfaceAppearance({
-                aboveGround : true,
+                aboveGround: true,
                 material: new Cesium.Material({
                     translucent: true,
-                    fabric : {
-                        type : 'Image',
-                        uniforms : {
-                            image : imagePath
+                    fabric: {
+                        type: 'Image',
+                        uniforms: {
+                            image: imagePath
                         }
                     }
                 }),
@@ -624,18 +626,18 @@ module PIC {
             });
         }
 
-        randomPoints (n = 200) {
+        randomPoints(n = 200) {
             for (var i = 0; i < n; i++) {
                 this.randomPoint();
             }
         }
 
-        randomPoint () {
+        randomPoint() {
             var bboxbig = "-118.6062_-46.6204_-99.3110_-31.6635";
             var bboxsml = "-116.4891_-45.0273_-101.4461_-33.1833";//-111.0687_-40.2230_-101.8181_-33.9660
             var phi = Math.random() * 2 * Math.PI;
             var rho = Math.random();
-            rho = Math.random()*(1-0.823529412)+0.823529412;
+            rho = Math.random() * (1 - 0.823529412) + 0.823529412;
             var x = Math.sqrt(rho) * Math.cos(phi);
             var y = Math.sqrt(rho) * Math.sin(phi);
             var xmin = -111.0687;
@@ -652,15 +654,15 @@ module PIC {
             var pt = Cesium.Cartesian3.fromDegrees(px, py, this.moonHeight);
             // console.log(px, py);
             this.points.add({
-                    position : pt,
-                    color: new Cesium.Color(1, 0.01, 1, 1),
-                    pixelSize : this.pixelSize,
-                    scaleByDistance : new Cesium.NearFarScalar(1.0e1, this.farScale, 8.0e6, this.nearScale)
-                });
+                position: pt,
+                color: new Cesium.Color(1, 0.01, 1, 1),
+                pixelSize: this.pixelSize,
+                scaleByDistance: new Cesium.NearFarScalar(1.0e1, this.farScale, 8.0e6, this.nearScale)
+            });
             this.notifyRepaintRequired();
         }
 
-        makeBoundsRect (from:Cesium.Cartographic = Cesium.Cartographic.fromDegrees(0,0), to:Cesium.Cartographic = Cesium.Cartographic.fromDegrees(1,1)):Cesium.RectangleGraphics {
+        makeBoundsRect(from: Cesium.Cartographic = Cesium.Cartographic.fromDegrees(0, 0), to: Cesium.Cartographic = Cesium.Cartographic.fromDegrees(1, 1)): Cesium.RectangleGraphics {
             return new Cesium.RectangleGraphics({
                 coordinates: Cesium.Rectangle.fromCartographicArray([from, to]),
                 outline: true,
@@ -687,7 +689,7 @@ module PIC {
             // });
         }
 
-        addNullIsland () {
+        addNullIsland() {
             this.nullIsland = this.viewer.dataSources.add(Cesium.GeoJsonDataSource.load(this.nullIslandPath, {
                 stroke: this.unknownColor,
                 strokeWidth: 3,
@@ -696,7 +698,7 @@ module PIC {
             }));
         }
 
-        loadBaseData () {
+        loadBaseData() {
             // this.loadTextFile(this.rootPath + "csv/latlons.txt?i=" + Math.round(Math.random() * 100000000), function (responseText) {
             this.loadTextFile(this.rootPath + "csv/latlons.txt", function (responseText) {
                 var baseData = JSON.parse(responseText)[1];
@@ -704,19 +706,19 @@ module PIC {
             });
         }
 
-        parseBaseData (baseData) {
+        parseBaseData(baseData) {
             var i, l = baseData.length;
             this.allIDs = [];
             this.pointArray = [];
-            for (i=0; i < l; i=i+6) {
-                var id = baseData[i+3];
+            for (i = 0; i < l; i = i + 6) {
+                var id = baseData[i + 3];
                 var index = this.pointArray.push([
                     baseData[i],
-                    baseData[i+1],
-                    baseData[i+2],
+                    baseData[i + 1],
+                    baseData[i + 2],
                     id,
-                    baseData[i+4],
-                    baseData[i+5]
+                    baseData[i + 4],
+                    baseData[i + 5]
                 ]);
                 index = index - 1;
                 this.pointHash[id] = index;
@@ -724,24 +726,24 @@ module PIC {
             }
 
             // this.loadTextFile(this.rootPath + "csv/heights.txt?i=" + Math.round(Math.random() * 100000000), function(responseText) {
-            this.loadTextFile(this.rootPath + "csv/heights.txt", function(responseText) {
+            this.loadTextFile(this.rootPath + "csv/heights.txt", function (responseText) {
                 var heightData = JSON.parse(responseText)[1];
                 this.parseHeightData(heightData);
             });
         }
 
-        parseHeightData (heightData) {
+        parseHeightData(heightData) {
             var i, l = heightData.length;
-            for (i=0; i < l; i=i+2) {
+            for (i = 0; i < l; i = i + 2) {
                 var id = heightData[i];
                 var index = this.pointHash[id];
                 if (this.pointArray[index] === undefined) continue;
-                this.pointArray[index][6] = heightData[i+1];
+                this.pointArray[index][6] = heightData[i + 1];
             }
             $("#facet-container").trigger("overlays:ready");
         }
 
-        displayBaseData () {
+        displayBaseData() {
             this.addPoints(this.allIDs);
             this.updateTotals(this.allIDs.length);
             this.enableFacets();
@@ -750,7 +752,7 @@ module PIC {
             this.applyBaseAggregations()
         }
 
-        applyAggregations (aggs) {
+        applyAggregations(aggs) {
             // console.log(aggs)
             for (var agg in aggs) {
                 var keypair = agg.split(".")
@@ -767,9 +769,9 @@ module PIC {
                 if (aggs[agg].buckets && aggs[agg].buckets.length !== 0) {
                     // some items in this facet should be visible
                     var data = widget.data
-                    var buckets:Array<Bucket> = aggs[agg].buckets
+                    var buckets: Array<Bucket> = aggs[agg].buckets
                     for (var thing in buckets) {
-                        var bucket:Bucket = buckets[thing]
+                        var bucket: Bucket = buckets[thing]
                         var count = bucket.doc_count
                         var item = bucket.key
                         widget.updateItemText(item, widget.data[item], count)
@@ -780,27 +782,31 @@ module PIC {
             }
         }
 
-        applyBaseAggregations () {
+        applyBaseAggregations() {
             // get aggregation data for empty search
             // for addresses only since base data includes a query for 50 results
             var filters = "hits.total,aggregations"
             // constituent aggs
             var data = this.buildElasticQuery(["ConstituentID:*"], ["*"], "parent")
-            this.getData({filters:filters, data:data, docType:"address", sort:"", source:"", size:0, callback:function(results){
-                if (results.aggregations) {
-                    this.applyAggregations(results.aggregations)
-                }
-                var dataB = this.buildElasticQuery(["ConstituentID:*"], ["*"], "child")
-                dataB.query.bool.must.pop() // hack to remove the has_child
-                this.getData({filters:filters, data:dataB, source:"", size:0, callback:function(resultsB){
-                    if (resultsB.aggregations) {
-                        this.applyAggregations(resultsB.aggregations)
+            this.getData({
+                filters: filters, data: data, docType: "address", sort: "", source: "", size: 0, callback: function (results) {
+                    if (results.aggregations) {
+                        this.applyAggregations(results.aggregations)
                     }
-                }})
-            }})
+                    var dataB = this.buildElasticQuery(["ConstituentID:*"], ["*"], "child")
+                    dataB.query.bool.must.pop() // hack to remove the has_child
+                    this.getData({
+                        filters: filters, data: dataB, source: "", size: 0, callback: function (resultsB) {
+                            if (resultsB.aggregations) {
+                                this.applyAggregations(resultsB.aggregations)
+                            }
+                        }
+                    })
+                }
+            })
         }
 
-        loadTextFile (url, callback, parameter = undefined) {
+        loadTextFile(url, callback, parameter = undefined) {
             var pic = this;
 
             var r = new XMLHttpRequest();
@@ -818,8 +824,8 @@ module PIC {
             r.send();
         }
 
-        getData({filters, data, callback, source, size = this.elasticSize, exclude = "", from = 0, parameter = undefined, docType = "constituent", sort = "AlphaSort.raw:asc", after = []}) {
-            var hasName = (this.buildFacetList().map( a => a.indexOf("DisplayName:") != -1 )).indexOf(true) != -1;
+        getData({ filters, data, callback, source, size = this.elasticSize, exclude = "", from = 0, parameter = undefined, docType = "constituent", sort = "AlphaSort.raw:asc", after = [] }) {
+            var hasName = (this.buildFacetList().map(a => a.indexOf("DisplayName:") != -1)).indexOf(true) != -1;
             // console.log(hasName);
             if (hasName) {
                 sort = "_score," + sort;
@@ -843,7 +849,7 @@ module PIC {
             r.setRequestHeader('Authorization', 'Basic ' + this.authHeader);
             r.setRequestHeader('Content-Type', 'application/json');
             // r.responseType = "json";
-            r.onreadystatechange = function() {
+            r.onreadystatechange = function () {
                 if (r.readyState != 4 || r.status != 200) return;
                 // console.log("result", r.responseText);
                 var res = JSON.parse(r.responseText)
@@ -866,7 +872,7 @@ module PIC {
             r.send(JSON.stringify(req));
         }
 
-        parseInnerHits (results) {
+        parseInnerHits(results) {
             var parsed = {
                 hits: {
                     total: results.hits.total,
@@ -879,16 +885,16 @@ module PIC {
                 }
                 if (results.hits.hits[hit].inner_hits != undefined) {
                     // console.log(results.hits.hits[hit])
-                    tmp._source.address = results.hits.hits[hit].inner_hits.address.hits.hits.map( a => a._source )
+                    tmp._source.address = results.hits.hits[hit].inner_hits.address.hits.hits.map(a => a._source)
                 }
                 parsed.hits.hits.push(tmp)
             }
             return parsed
         }
 
-        buildAggregations (type:string) {
+        buildAggregations(type: string) {
             var aggs = {}
-            for (var i=0; i < this.facets.length; i++) {
+            for (var i = 0; i < this.facets.length; i++) {
                 var facet = this.facets[i]
                 if (facet[3] != "") {
                     var name = facet[2]
@@ -918,7 +924,7 @@ module PIC {
             return aggs//{ "aggregations" : aggs }
         }
 
-        buildElasticQuery (normal:Array<string>, filter:Array<string>, type:string) {
+        buildElasticQuery(normal: Array<string>, filter: Array<string>, type: string) {
             // console.log("buildEQ", normal, filter);
 
             var filterType = "has_child"
@@ -948,6 +954,7 @@ module PIC {
             var nestedFilter = {};
             var nestedQuery = this.makeEmptyQuery(type);
             var hasNestedFilter = false;
+            var ignoreBbox = false;
 
             data["query"] = {
                 "bool": {
@@ -971,6 +978,9 @@ module PIC {
                 var query = { "query_string": { "query": nestedString } }
                 if (type === "child") {
                     // looking for addresses
+                    addressArray.forEach(item => {
+                        if (item.indexOf("Remarks") !== -1) ignoreBbox = true
+                    })
                     nestedQuery[filterType]["query"]["bool"]["must"].push(query);
                 } else {
                     // looking for constituents so query applies to main data
@@ -987,14 +997,21 @@ module PIC {
                 if (filterSplit.length === 2) edgesArray = filterSplit[1].split("_");
 
                 if (filter[0] !== "*" && filter[0] !== "(*)" && edgesArray.length === 4) {
-                    hasNestedFilter = true;
-                    nestedFilter = {
-                        "geo_bounding_box": {
-                            "address.Location": {
-                                "left": Number(edgesArray[0]),
-                                "bottom": Number(edgesArray[1]),
-                                "right": Number(edgesArray[2]),
-                                "top": Number(edgesArray[3])
+                    const left = Number(edgesArray[0]);
+                    const bottom = Number(edgesArray[1]);
+                    const right = Number(edgesArray[2]);
+                    const top = Number(edgesArray[3]);
+                    
+                    if (left < right && top > bottom && left !== -90 && right !== 90 && top !== 180 && bottom !== -180 && !ignoreBbox) {
+                        hasNestedFilter = true;
+                        nestedFilter = {
+                            "geo_bounding_box": {
+                                "Location": {
+                                    "left": left,
+                                    "bottom": bottom,
+                                    "right": right,
+                                    "top": top
+                                }
                             }
                         }
                     }
@@ -1004,21 +1021,10 @@ module PIC {
 
             if (hasNestedFilter) {
                 if (type === "child") {
-                    nestedQuery[filterType]["query"] = {
-                        "filtered": {
-                            "query": nestedQuery[filterType]["query"],
-                            "filter": nestedFilter
-                        }
-                    }
-                    data["query"]["bool"]["must"].push(nestedQuery)
+                    data["query"]["bool"]["filter"] = nestedFilter
                 } else {
                     data["query"]["bool"]["must"].push(nestedQuery)
-                    data = {
-                        "query": {
-                            "filtered": data
-                        }
-                    }
-                    data["query"]["filtered"]["filter"] = nestedFilter
+                    data["query"]["bool"]["filter"] = nestedFilter
                 }
             } else {
                 data["query"]["bool"]["must"].push(nestedQuery)
@@ -1029,7 +1035,7 @@ module PIC {
             return data
         }
 
-        makeEmptyQuery (type:string) {
+        makeEmptyQuery(type: string) {
             var filter = "has_child", value = "address"
             if (type === "parent") {
                 filter = "has_parent"
@@ -1047,7 +1053,7 @@ module PIC {
             return query
         }
 
-        updateTotals (total) {
+        updateTotals(total) {
             // console.log("total", total, this.elasticResults);
             if (total === -1) total = this.elasticResults.total;
             $("#total-points").html("<span class=\"number\">" + total.toLocaleString() + "</span><br />" + this.humanizeFilters());
@@ -1063,7 +1069,7 @@ module PIC {
             this.notifyRepaintRequired();
         }
 
-        updateBounds () {
+        updateBounds() {
             // console.log(bounds);
             if (!this.hasWebGL) return
             var west = this.bounds[2];
@@ -1071,13 +1077,13 @@ module PIC {
             var east = this.bounds[0];
             var north = this.bounds[1];
             this.viewer.camera.flyTo({
-                destination : Cesium.Rectangle.fromDegrees(west, south, east, north),
-                duration : 1
+                destination: Cesium.Rectangle.fromDegrees(west, south, east, north),
+                duration: 1
             });
             this.notifyRepaintRequired();
         }
 
-        minimizeFacets () {
+        minimizeFacets() {
             this.facetsMinimized = true;
             $("#facet-container").addClass("minimized");
             $("#facet-container .minimize").addClass("hidden");
@@ -1085,7 +1091,7 @@ module PIC {
             this.updateLefts();
         }
 
-        maximizeFacets () {
+        maximizeFacets() {
             this.facetsMinimized = false;
             $("#facet-container").removeClass("minimized");
             $("#facet-container .minimize").removeClass("hidden");
@@ -1187,9 +1193,9 @@ module PIC {
 
             this.canvas.setAttribute('tabindex', '0'); // needed to put focus on the canvas
 
-            $("#facet-container, #constituents").mousemove( () => {
+            $("#facet-container, #constituents").mousemove(() => {
                 this.positionHover(false);
-            } );
+            });
 
             // this.canvas.onclick = (e) => {
             //     this.canvas.focus();
@@ -1199,7 +1205,7 @@ module PIC {
             //     this.refreshPicked(pickedObject);
             // };
             this.viewer.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK)
-            
+
             this.canvas.ondblclick = (e) => {
                 console.log(e)
                 var p = new Cesium.Cartesian2(e.layerX, e.layerY)
@@ -1212,16 +1218,16 @@ module PIC {
                     height = Cesium.Cartographic.fromCartesian(this.camera.positionWC).height / this.zoomIncrement
                 }
                 if (height <= this.minHeight) height = this.minHeight
-                var destination =  this.scene.globe.ellipsoid.cartesianToCartographic(cartesian)
+                var destination = this.scene.globe.ellipsoid.cartesianToCartographic(cartesian)
                 console.log(p, cartesian, destination, height)
                 this.camera.flyTo({
-                    destination : Cesium.Cartesian3.fromRadians(destination.longitude, destination.latitude, height),
-                    duration : 1.0
+                    destination: Cesium.Cartesian3.fromRadians(destination.longitude, destination.latitude, height),
+                    duration: 1.0
                 })
                 this.notifyRepaintRequired()
             }
 
-            this.canvas.onmousemove = this.canvas.ontouchmove = (e) => {
+            this.bboxDiv.onmousemove = this.bboxDiv.ontouchmove = this.canvas.onmousemove = this.canvas.ontouchmove = (e) => {
                 var c = new Cesium.Cartesian2(e.layerX, e.layerY);
                 if (!c) return;
                 this.mousePosition = c;
@@ -1230,14 +1236,14 @@ module PIC {
                 if (this.isDrawing) this.drawMove(c);
             }
 
-            this.canvas.onmousedown = this.canvas.ontouchstart = (e) => {
+            this.bboxDiv.onmousedown = this.bboxDiv.ontouchstart = (e) => {
                 var c = new Cesium.Cartesian2(e.layerX, e.layerY);
                 this.mousePosition = this.startMousePosition = c;
                 if (this.isDrawing) this.drawStart(c);
                 this.hideBoundsDialog();
             }
 
-            this.canvas.onmouseup = this.canvas.ontouchend = (e) => {
+            this.bboxDiv.onmouseup = this.bboxDiv.ontouchend = (e) => {
                 var c = new Cesium.Cartesian2(e.layerX, e.layerY);
                 this.mousePosition = this.startMousePosition = c;
                 if (this.isDrawing) this.drawEnd(c);
@@ -1247,7 +1253,7 @@ module PIC {
 
         }
 
-        positionBoundsDialog (x, y) {
+        positionBoundsDialog(x, y) {
             var bWidth = $("#bounds").width();
             var cWidth = $("#cesiumContainer").width();
             var xPx = x + "px";
@@ -1259,15 +1265,15 @@ module PIC {
             $("#bounds").css("left", xPx);
         }
 
-        showBoundsDialog () {
+        showBoundsDialog() {
             $("#bounds").fadeIn(100);
         }
 
-        hideBoundsDialog () {
+        hideBoundsDialog() {
             $("#bounds").hide();
         }
 
-        applyBounds () {
+        applyBounds() {
             var widget = this.facetWidgets["bbox"];
             this.hideBoundsDialog();
             this.stopDrawing();
@@ -1275,7 +1281,7 @@ module PIC {
             this.applyFilters();
         }
 
-        cancelBounds () {
+        cancelBounds() {
             var widget = this.facetWidgets["bbox"];
             widget.reset();
             this.initFacetWidget(widget);
@@ -1296,12 +1302,12 @@ module PIC {
             this.drawSelection();
         }
 
-        drawEnd (position:Cesium.Cartesian2) {
+        drawEnd(position: Cesium.Cartesian2) {
             this.isPenDown = false;
             this.showBoundsDialog();
         }
 
-        drawMove (position:Cesium.Cartesian2) {
+        drawMove(position: Cesium.Cartesian2) {
             if (!this.isPenDown) return;
             if (!position) return;
             // console.log("drawmove pos", position);
@@ -1310,30 +1316,31 @@ module PIC {
             // console.log("drawmove cart", cartesian);
             var cartographic = Cesium.Cartographic.fromCartesian(cartesian);
             this.boundsTo = cartographic;
-            this.setBboxWidget([this.boundsFrom,this.boundsTo]);
+            this.setBboxWidget([this.boundsFrom, this.boundsTo]);
             this.drawSelection();
         }
 
-        drawSelection () {
+        drawSelection() {
             if (this.boundsFrom != this.boundsTo) this.boundsSelectionEntity.rectangle = this.makeBoundsRect(this.boundsFrom, this.boundsTo);
             this.notifyRepaintRequired();
         }
 
-        drawBounds (north:number, south:number, east:number, west:number) {
+        drawBounds(north: number, south: number, east: number, west: number) {
             this.scene.primitives.remove(this.boundsPrimitive);
+            if (west <= -90 && east >= 90 && north >= 180 && south <= -180) return;
             this.boundsPrimitive = new Cesium.Primitive({
                 geometryInstances: new Cesium.GeometryInstance({
-                geometry: new Cesium.RectangleOutlineGeometry({
-                    rectangle: Cesium.Rectangle.fromDegrees(west, south, east, north)
+                    geometry: new Cesium.RectangleOutlineGeometry({
+                        rectangle: Cesium.Rectangle.fromDegrees(west, south, east, north)
+                    }),
+                    attributes: {
+                        color: Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.WHITE.withAlpha(0.5))
+                    }
                 }),
-                attributes: {
-                    color: Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.WHITE.withAlpha(0.5))
-                }
-            }),
                 appearance: new Cesium.PerInstanceColorAppearance({
-                    flat : true,
-                    renderState : {
-                        lineWidth : Math.min(2.0, this.scene.maximumAliasedLineWidth)
+                    flat: true,
+                    renderState: {
+                        lineWidth: Math.min(2.0, this.scene.maximumAliasedLineWidth)
                     }
                 }),
                 releaseGeometryInstances: false
@@ -1342,7 +1349,7 @@ module PIC {
             this.scene.primitives.add(this.boundsPrimitive);
         }
 
-        pickEntity (windowPosition) {
+        pickEntity(windowPosition) {
             var picked = this.scene.pick(windowPosition);
             if (picked !== undefined) {
                 var id = Cesium.defaultValue(picked.id, picked.primitive.id);
@@ -1353,10 +1360,10 @@ module PIC {
             return undefined;
         };
 
-        refreshPicked (picked) {
+        refreshPicked(picked) {
             var showHover = false;
             if (this.isDrawing) return;
-            if (Cesium.defined(picked) && picked.id &&  (picked.id.toString().indexOf("P_") === 0)) {
+            if (Cesium.defined(picked) && picked.id && (picked.id.toString().indexOf("P_") === 0)) {
                 if (this.pickedEntity === undefined || picked !== this.pickedEntity.entity) {
                     this.pickedEntity = {
                         color: Cesium.clone(picked.primitive.color),
@@ -1371,7 +1378,7 @@ module PIC {
             this.positionHover(showHover);
         }
 
-        buildHover () {
+        buildHover() {
             var position = this.pickedEntity.entity.primitive.originalLatlon;
             var filter = "hits.total";
             // TODO: fix hover query
@@ -1380,10 +1387,10 @@ module PIC {
             facetList.push(query);
             var data = this.buildFacetQuery(facetList);
             // console.log("hover", data);
-            this.getData({filters:filter, data:data, callback:this.buildHoverContent, source:"", size:3});
+            this.getData({ filters: filter, data: data, callback: this.buildHoverContent, source: "", size: 3 });
         }
 
-        buildHoverContent (data) {
+        buildHoverContent(data) {
             var el = $("#hover");
             if (this.pickedEntity === undefined) return;
             var position = this.pickedEntity.entity.primitive.originalLatlon;
@@ -1425,7 +1432,7 @@ module PIC {
             // this.loadTextFile(reverseGeo, this.parseHoverLocation);
         }
 
-        parseHoverLocation (data) {
+        parseHoverLocation(data) {
             // console.log(data);
             if (!data.geonames) return;
             var geo = data.geonames[0];
@@ -1433,21 +1440,21 @@ module PIC {
             this.updateHoverLocation("near " + geo.name + ", " + geo.countrycode);
         }
 
-        updateHoverLocation (text) {
+        updateHoverLocation(text) {
             $("#geoname").text(text);
             this.positionHover(true);
         }
 
-        positionHover (visible) {
+        positionHover(visible) {
             var el = $("#hover");
             var leftOffset = $("#cesiumContainer").position().left;
             var topOffset = $("#cesiumContainer").position().top;
             var margin = 5;
             if (this.mousePosition === undefined) return;
-            var x = this.mousePosition.x-(el.width()*.5);
-            var y = this.mousePosition.y-el.height()-margin;
+            var x = this.mousePosition.x - (el.width() * .5);
+            var y = this.mousePosition.y - el.height() - margin;
             if (y < topOffset) {
-                y = this.mousePosition.y+100;
+                y = this.mousePosition.y + 100;
             }
             if (x + el.width() > $("#cesiumContainer").width()) {
                 x = $("#cesiumContainer").width() - el.width() - 20;
@@ -1457,10 +1464,10 @@ module PIC {
                 y = -10000;
             }
             x += leftOffset;
-            el.offset({left:x, top:y});
+            el.offset({ left: x, top: y });
         }
 
-        setBboxWidget (bbox:Array<Cesium.Cartographic>) {
+        setBboxWidget(bbox: Array<Cesium.Cartographic>) {
             var rectangle = Cesium.Rectangle.fromCartographicArray(bbox);
             var widget = this.facetWidgets["bbox"];
             var current = widget.getActiveValue();
@@ -1473,7 +1480,8 @@ module PIC {
             }
         }
 
-        startDrawing () {
+        startDrawing() {
+            this.bboxDiv.classList.add("active");
             this.isDrawing = true;
             this.scene.screenSpaceCameraController.enableRotate = false;
             this.scene.screenSpaceCameraController.enableTranslate = false;
@@ -1482,6 +1490,7 @@ module PIC {
         }
 
         stopDrawing() {
+            this.bboxDiv.classList.remove("active");
             this.isDrawing = false;
             this.scene.screenSpaceCameraController.enableRotate = true;
             this.scene.screenSpaceCameraController.enableTranslate = true;
@@ -1498,7 +1507,7 @@ module PIC {
             }
         }
 
-        updateResults (data) {
+        updateResults(data) {
             this.clearResults();
             if (data.aggregations) {
                 this.applyAggregations(data.aggregations)
@@ -1522,7 +1531,7 @@ module PIC {
             if (total > 0) this.addResults(constituents, 0, data.hits.total);
             this.updateTotals(-1);
             // // now to see if a line should be shown
-            var lineID = parseInt(location.hash.replace("#",""));
+            var lineID = parseInt(location.hash.replace("#", ""));
             // // console.log(lineID);
             if (!isNaN(lineID)) {
                 this.connectAddresses(lineID);
@@ -1530,7 +1539,7 @@ module PIC {
             this.scrollResults();
         }
 
-        addResults (results, start, total) {
+        addResults(results, start, total) {
             var l = results.length;
             if (start > 0) {
                 this.resultsElement.find(".results").append("<p><strong>Results " + (start) + " to " + (start + l) + "</strong></p>");
@@ -1541,28 +1550,30 @@ module PIC {
             this.resultsElement.find(".results").append("<hr />");
             if (start + l < total) {
                 var more = total - (l + start) > this.resultLimit ? this.resultLimit : total - (l + start);
-                var string = '<div class="link more"><span>Load '+more+' more</span></div>';
+                var string = '<div class="link more"><span>Load ' + more + ' more</span></div>';
                 this.resultsElement.find(".more").replaceWith(string);
-                this.resultsElement.find(".more").click( () => this.loadMoreResults(start + l) );
+                this.resultsElement.find(".more").click(() => this.loadMoreResults(start + l));
             }
         }
 
-        loadMoreResults (start) {
+        loadMoreResults(start) {
             this.resultsElement.find(".more").empty();
             var filters = "hits.total,hits.hits";//this.buildBaseQueryFilters();
             var data = this.buildFacetQuery();
             // console.log(start, data);
-            this.getData({filters:filters, data:data, callback:function(data) {
-                var scroll = $("#constituents .scroller").scrollTop();
-                var height = $("#constituents .scroller").height();
-                var constituents = data.hits.hits;
-                this.totalPhotographers = data.hits.total;
-                this.addResults(constituents, start, data.hits.total);
-                this.scrollResults(scroll + height - 100);
-            }, source:"", size:this.resultLimit, exclude:"address", from:start});
+            this.getData({
+                filters: filters, data: data, callback: function (data) {
+                    var scroll = $("#constituents .scroller").scrollTop();
+                    var height = $("#constituents .scroller").height();
+                    var constituents = data.hits.hits;
+                    this.totalPhotographers = data.hits.total;
+                    this.addResults(constituents, start, data.hits.total);
+                    this.scrollResults(scroll + height - 100);
+                }, source: "", size: this.resultLimit, exclude: "address", from: start
+            });
         }
 
-        buildConstituent (p) {
+        buildConstituent(p) {
             var str = '<div id="constituent-item-' + p.ConstituentID + '" class="constituent-item">';
             str += '<h3 class="constituent-toggle-' + p.ConstituentID + '"><span class="title">' + p.DisplayName;
             str += '</span>';
@@ -1589,7 +1600,7 @@ module PIC {
             if (p.addressTotal > 0) {
                 str += '<div class="address-toggle link"><strong>';
                 if (p.addressTotal != 1) {
-                    str += 'Locations ('+p.addressTotal+')';
+                    str += 'Locations (' + p.addressTotal + ')';
                 } else {
                     str += 'Location';
                 }
@@ -1643,7 +1654,7 @@ module PIC {
                     if (p.collection[i].URL == "") {
                         continue;
                     }
-                    var link = '<li><a target="_blank" class="external" title="this link opens in a new window" href="'+ p.collection[i].URL +'">';
+                    var link = '<li><a target="_blank" class="external" title="this link opens in a new window" href="' + p.collection[i].URL + '">';
                     link += p.collection[i].Term;
                     link += '</a></li>';
                     links.push(link);
@@ -1663,7 +1674,7 @@ module PIC {
                 str += "<strong>Data from:</strong>";
                 var links = [];
                 for (var i in p.biography) {
-                    var link = '<li><a target="_blank" class="external" title="this link opens in a new window" href="'+ p.biography[i].URL +'">';
+                    var link = '<li><a target="_blank" class="external" title="this link opens in a new window" href="' + p.biography[i].URL + '">';
                     link += p.biography[i].Term;
                     link += '</a></li>';
                     links.push(link);
@@ -1674,23 +1685,23 @@ module PIC {
             }
             str += "</div>"; // metadata end
             if (p.addressTotal > 0) {
-                str += '<div class="addresses"><div id="constituent-addresslist-'+p.ConstituentID+'"></div></div>';
+                str += '<div class="addresses"><div id="constituent-addresslist-' + p.ConstituentID + '"></div></div>';
             }
             str += "</div>";
             this.resultsElement.find(".results").append(str);
-            $(".constituent-toggle-" + p.ConstituentID).click( () => {
+            $(".constituent-toggle-" + p.ConstituentID).click(() => {
                 $(".constituent-content-" + p.ConstituentID).fadeToggle(200);
                 $("#constituent-item-" + p.ConstituentID).toggleClass("open");
                 $(".constituent-toggle-" + p.ConstituentID).toggleClass("open");
                 // window.open("/constituents/" + p.ConstituentID);
             });
-            $("#constituent-item-" + p.ConstituentID + " .metadata-toggle").click( () => {
+            $("#constituent-item-" + p.ConstituentID + " .metadata-toggle").click(() => {
                 $("#constituent-item-" + p.ConstituentID + " .metadata-toggle").addClass("active");
                 $("#constituent-item-" + p.ConstituentID + " .address-toggle").removeClass("active");
                 $(".constituent-metadata-" + p.ConstituentID).addClass("open");
                 $("#constituent-addresslist-" + p.ConstituentID + " .constituent-addresslist").removeClass("open");
-            } );
-            $("#constituent-item-" + p.ConstituentID + " .address-toggle").click( () => {
+            });
+            $("#constituent-item-" + p.ConstituentID + " .address-toggle").click(() => {
                 if (!$("#constituent-addresslist-" + p.ConstituentID).hasClass("loaded")) {
                     $("#constituent-addresslist-" + p.ConstituentID).addClass("loaded");
                     $("#constituent-addresslist-" + p.ConstituentID).append('<div class="address-spinner"></div>');
@@ -1711,27 +1722,27 @@ module PIC {
             });
         }
 
-        getAddressList (id) {
+        getAddressList(id) {
             // console.log(id);
             // change url without commiting new state change
             var filters = "hits.total,hits.hits";
-            var data = this.buildElasticQuery(["ConstituentID:" + id,"address.ConstituentID:" + id], ["*"], "parent");
-            this.getData({filters:filters, data:data, callback:this.parseConstituentAddresses, source:"", docType:"address", size:this.elasticSize, exclude:"", sort:"", from:0, parameter:id});
+            var data = this.buildElasticQuery(["ConstituentID:" + id, "address.ConstituentID:" + id], ["*"], "parent");
+            this.getData({ filters: filters, data: data, callback: this.parseConstituentAddresses, source: "", docType: "address", size: this.elasticSize, exclude: "", sort: "", from: 0, parameter: id });
         }
 
-        parseConstituentAddresses (data, id) {
+        parseConstituentAddresses(data, id) {
             $("#constituent-addresslist-" + id + " .address-spinner").remove();
             // console.log(data)
             this.buildConstituentAddresses(id, data.hits.hits);
             this.connectAddresses(id);
         }
 
-        buildConstituentAddresses (id, addresses) {
+        buildConstituentAddresses(id, addresses) {
             // console.log(id);
             if (addresses) {
                 addresses = this.sortAddresses(addresses)
                 var addstring = "";
-                for (var i=0; i < addresses.length; i++) {
+                for (var i = 0; i < addresses.length; i++) {
                     var add = addresses[i];
                     // console.log(add)
                     addstring += "<div class=\"address-item\">";
@@ -1766,15 +1777,15 @@ module PIC {
                 str += addstring;
                 str += '</div>';
                 $("#constituent-addresslist-" + id).append(str);
-                $("#constituent-addresslist-" + id + " .connector").click( () => this.connectAddresses(id) );
-                $("#constituent-addresslist-" + id + " .link.constituent-address").click( (e) => {
-                        var id = $(e.target).data("id");
-                        if (this.hasWebGL) this.flyToAddressID(id);
+                $("#constituent-addresslist-" + id + " .connector").click(() => this.connectAddresses(id));
+                $("#constituent-addresslist-" + id + " .link.constituent-address").click((e) => {
+                    var id = $(e.target).data("id");
+                    if (this.hasWebGL) this.flyToAddressID(id);
                 });
             }
         }
 
-        sortAddresses (addresses:Array<any>) {
+        sortAddresses(addresses: Array<any>) {
             // console.log(addresses)
             var sortedAddresses = []
             var born
@@ -1811,18 +1822,18 @@ module PIC {
             return sortedAddresses
         }
 
-        flyToAddressID (id) {
+        flyToAddressID(id) {
             var index = this.pointHash[id];
             var p = this.pointArray[index];
             var height = p[6] ? p[6] + (this.heightDelta * 50) : (this.heightDelta * 50);
             // console.log(id, height, p);
             this.viewer.camera.flyTo({
-                destination : Cesium.Cartesian3.fromDegrees(p[1], p[0], height),
-                duration : 1.5
+                destination: Cesium.Cartesian3.fromDegrees(p[1], p[0], height),
+                duration: 1.5
             });
         }
 
-        connectAddresses (id) {
+        connectAddresses(id) {
             // console.log(id);
             if (!this.hasWebGL) return
             location.hash = id;
@@ -1847,7 +1858,7 @@ module PIC {
             var positions = [];
             var colors = [];
             var usefulAddresses = 0
-            for (var i=0; i < addresses.length; i++) {
+            for (var i = 0; i < addresses.length; i++) {
                 var p = addresses[i];
                 // console.log(p, addresses[i]);
                 if (p === undefined) continue;
@@ -1856,54 +1867,56 @@ module PIC {
                 var height = p[6] !== undefined ? p[6] : this.heightHash[p[3]];
                 positions.push(p[1], p[0], height);
                 colors.push(this.addressTypePalette[p[4]]);
-                usefulAddresses ++
+                usefulAddresses++
             }
 
             if (usefulAddresses > 1) {
                 this.lines = new Cesium.Primitive({
-                  geometryInstances : new Cesium.GeometryInstance({
-                    geometry : new Cesium.PolylineGeometry({
-                      positions : Cesium.Cartesian3.fromDegreesArrayHeights(positions),
-                      width : this.lineWidth,
-                      vertexFormat : Cesium.PolylineColorAppearance.VERTEX_FORMAT,
-                      colors: colors,
-                      colorsPerVertex: true
+                    geometryInstances: new Cesium.GeometryInstance({
+                        geometry: new Cesium.PolylineGeometry({
+                            positions: Cesium.Cartesian3.fromDegreesArrayHeights(positions),
+                            width: this.lineWidth,
+                            vertexFormat: Cesium.PolylineColorAppearance.VERTEX_FORMAT,
+                            colors: colors,
+                            colorsPerVertex: true
+                        })
+                    }),
+                    appearance: new Cesium.PolylineColorAppearance({
+                        translucent: false
                     })
-                  }),
-                  appearance : new Cesium.PolylineColorAppearance({
-                    translucent : false
-                  })
                 });
                 this.scene.primitives.add(this.lines);
                 this.updateLineText(id)
             }
-            
+
 
             this.updateBounds();
         }
-        
-        updateLineText (id = undefined) {
+
+        updateLineText(id = undefined) {
             $("#total-points .linetext").remove()
             if (id === undefined) return
             var filters = "hits.total,hits.hits";
             var data = this.buildElasticQuery(["ConstituentID:" + id], ["*"], "child")
-            this.getData({filters:filters, data:data, callback:function (data) {
-                // console.log(data)
-                if (!data.hits.hits || data.hits.hits.length < 1) return
-                var html = '<div class="linetext">'
-                html += 'Showing lines for '
-                html += data.hits.hits[0]._source.DisplayName
-                html += '</div>'
-                $("#total-points").append(html)
-            }, source:"DisplayName", docType:"constituent", size:1, exclude:"", sort:"", from:0})
+            this.getData({
+                filters: filters, data: data, callback: function (data) {
+                    // console.log(data)
+                    if (!data.hits.hits || data.hits.hits.length < 1) return
+                    var html = '<div class="linetext">'
+                    html += 'Showing lines for '
+                    html += data.hits.hits[0]._source.DisplayName
+                    html += '</div>'
+                    $("#total-points").append(html)
+                }, source: "DisplayName", docType: "constituent", size: 1, exclude: "", sort: "", from: 0
+            })
         }
 
-        dimPoints () {
+        dimPoints() {
             // TODO: dim points function
         }
 
-        getFacets () {
-            for (var i=0; i < this.facets.length; i++) {
+        getFacets() {
+            for (var i = 0; i < this.facets.length; i++) {
                 if (this.facets[i][1] != "") {
                     if (this.facets[i][3] === "AddressType") $("#facet-list").append("<h4>Locations</h4>")
                     if (this.facets[i][3] === "Nationality") $("#facet-list").append("<h4>Constituents</h4>")
@@ -1913,7 +1926,7 @@ module PIC {
             }
         }
 
-        getFacet (index) {
+        getFacet(index) {
             var facet = this.facets[index];
 
             var widget = this.createFacet(facet);
@@ -1929,7 +1942,7 @@ module PIC {
             }
         }
 
-        createFacet (facet):Facet {
+        createFacet(facet): Facet {
             var f = facet[0];
             this.facetValues[f] = {};
             this.facetWidgets[f] = new Facet(f, $("#facet-list"), facet[1]);
@@ -1937,8 +1950,8 @@ module PIC {
             return this.facetWidgets[f];
         }
 
-        updateFacet (responseText, facet) {
-            var data = responseText.csvToArray({trim:true, rSep: '\n'});
+        updateFacet(responseText, facet) {
+            var data = responseText.csvToArray({ trim: true, rSep: '\n' });
             var widget = this.facetWidgets[facet[0]];
             var idColumn = data[0].indexOf(facet[2]);
             var nameColumn = data[0].indexOf(facet[3]);
@@ -1954,14 +1967,14 @@ module PIC {
             this.initFacetWidget(widget);
         }
 
-        initFacetWidget (facet:Facet) {
+        initFacetWidget(facet: Facet) {
             facet.init();
             facet.element.on("facet:change", (e, widget: Facet) => { this.onFacetChanged(widget) });
         }
 
-        facetWithName (name): Array<string> | Number {
-            for (var i=0; i < this.facets.length; i++) {
-                if (this.facets[i][0]==name) return this.facets[i];
+        facetWithName(name): Array<string> | Number {
+            for (var i = 0; i < this.facets.length; i++) {
+                if (this.facets[i][0] == name) return this.facets[i];
             }
             return -1;
         }
@@ -1980,13 +1993,13 @@ module PIC {
             this.clearResults();
         }
 
-        enableFacets () {
+        enableFacets() {
             for (var widget in this.facetWidgets) {
                 this.facetWidgets[widget].enable();
             }
         }
 
-        buildFacetList () {
+        buildFacetList() {
             var facetList = [];
             for (var k in this.filters) {
                 if (this.filters[k] != "*") {
@@ -1996,6 +2009,7 @@ module PIC {
                         // facetList.push("(BeginDate:" + this.filters[k] + " OR EndDate:" + this.filters[k] + ")");
                     } else if (k === "bbox") {
                         var bbox = this.filters[k];
+                        if (bbox === "-180_-90_180_90") continue;
                         facetList.push("bbox:" + bbox);
                     } else {
                         facetList.push("(" + k + ":" + this.filters[k] + ")");
@@ -2005,7 +2019,7 @@ module PIC {
             return facetList;
         }
 
-        buildFacetQuery (facetList=undefined, type:string="child") {
+        buildFacetQuery(facetList = undefined, type: string = "child") {
             if (facetList === undefined) facetList = this.buildFacetList();
             var normal = [];
             var filter = [];
@@ -2020,7 +2034,7 @@ module PIC {
                             // removing period to allow for searches like "john d. rock"
                             normal.push(facetList[k].replace(/([\.]*)/g, ''));
                         } else {
-                            normal.push("(ConstituentID:"+cleaned+")");
+                            normal.push("(ConstituentID:" + cleaned + ")");
                         }
                     } else if (facetList[k].indexOf("Place") !== -1) {
                         // deconstruct facet to convert to ID
@@ -2048,10 +2062,10 @@ module PIC {
             this.hideSpinner(this.resultsElement);
         }
 
-        updateFilter (facetName, value) {
+        updateFilter(facetName, value) {
             var facet = this.facetWithName(facetName);
             if (facet[4] !== "") {
-                this.filters[facet[4]+"."+facet[2]] = value;
+                this.filters[facet[4] + "." + facet[2]] = value;
             } else if (facet[2] === "DisplayName") {
                 this.filters[facet[2]] = value;
             } else if (facet[2] === "bbox") {
@@ -2065,12 +2079,12 @@ module PIC {
             }
         }
 
-        applyFilters () {
+        applyFilters() {
             var url = this.buildQueryString();
             Historyjs.pushState(this.filters, "PIC - Photographers’ Identities Catalog", url);
         }
 
-        buildQueryString ():string {
+        buildQueryString(): string {
             var url = "?";
             var keyVals = [];
             for (var filter in this.filters) {
@@ -2083,11 +2097,11 @@ module PIC {
             return url;
         }
 
-        scrollResults (value = 0) {
-            $("#constituents .scroller").animate({scrollTop:value}, 500, 'swing');
+        scrollResults(value = 0) {
+            $("#constituents .scroller").animate({ scrollTop: value }, 500, 'swing');
         }
 
-        changeState () {
+        changeState() {
             this.pickedEntity = undefined;
             this.closeFacets();
             this.disableFacets();
@@ -2117,12 +2131,12 @@ module PIC {
             if (facetList.length === 0) {
                 this.displayBaseData();
             } else {
-                this.getData({filters:filters, data:data, callback:this.getNextSet, docType: "address", sort: "_uid", source:"ConAddressID"});
+                this.getData({ filters: filters, data: data, callback: this.getNextSet, docType: "address", sort: "_uid", source: "ConAddressID" });
             }
             this.updateTotals(-1);
         }
 
-        clearFilters () {
+        clearFilters() {
             this.resetNameQuery();
             this.resetDateQuery();
             for (var i = 0; i < this.facets.length; i++) {
@@ -2139,10 +2153,11 @@ module PIC {
             this.applyFilters();
         }
 
-        getNextSet (results) {
+        getNextSet(results) {
             // console.log(results);
             // elasticResults.hits = elasticResults.hits.concat(results.hits.hits
             this.totalPhotographers = 0//results.hits.total;
+            if (!results) return;
             if (results.aggregations) {
                 this.applyAggregations(results.aggregations)
             }
@@ -2151,7 +2166,7 @@ module PIC {
                 var data = this.elasticResults.data;
                 this.elasticResults.from += this.elasticSize;
                 var filters = this.elasticResults.filters;
-                this.getData({filters:filters, data:data, callback:this.getNextSet, docType: "address", sort:"_uid", source:"ConAddressID", size:this.elasticSize, exclude:"", from:0, after: ["address#"+results.hits.hits[results.hits.hits.length-1]._id]});
+                this.getData({ filters: filters, data: data, callback: this.getNextSet, docType: "address", sort: "_uid", source: "ConAddressID", size: this.elasticSize, exclude: "", from: 0, after: ["address#" + results.hits.hits[results.hits.hits.length - 1]._id] });
             } else {
                 var end = new Date().getTime();
                 var time = end - this.start;
@@ -2166,14 +2181,14 @@ module PIC {
             this.updateTotals(-1);
         }
 
-        showResults () {
+        showResults() {
             var data = this.buildFacetQuery();
             var filters = "hits.total,hits.hits,aggregations";//this.buildBaseQueryFilters();
             // console.log("results", data);
-            this.getData({filters:filters, data:data, callback:this.updateResults, source:"", size:this.resultLimit});
+            this.getData({ filters: filters, data: data, callback: this.updateResults, source: "", size: this.resultLimit });
         }
 
-        showSpinner (target, opts = {}) {
+        showSpinner(target, opts = {}) {
             var defaults = {
                 lines: 20, // The number of lines to draw
                 length: 0, // The length of each line
@@ -2198,11 +2213,11 @@ module PIC {
             target.append(spin.el);
         }
 
-        hideSpinner (target) {
+        hideSpinner(target) {
             target.find(".spinner").remove();
         }
 
-        addressesForID (id) {
+        addressesForID(id) {
             var i;
             var addresses = [];
             for (i in this.pointArray) {
@@ -2211,26 +2226,26 @@ module PIC {
             return addresses;
         }
 
-        addressesToPoints (hits) {
+        addressesToPoints(hits) {
             var addresses = [];
             // var hits = elasticResults.hits;
             // console.log(elasticResults);
             var i, j, l = hits.length;
-            for (i=0; i < l; ++i) {
+            for (i = 0; i < l; ++i) {
                 var item = hits[i]._source;
                 if (item.ConAddressID === undefined) continue;
                 // for (j=0; j < item.address.length; ++j) {
-                    addresses.push(item.ConAddressID);
+                addresses.push(item.ConAddressID);
                 // }
             }
             this.addPoints(addresses);
         }
 
-        addPoints (newPoints) {
+        addPoints(newPoints) {
             // console.log("addpoints",newPoints)
             if (!this.hasWebGL) return
             if (newPoints.length === 0) return;
-            var addressType = $("#"+this.facetWithName("addresstypes")[0]).data("value").toString();
+            var addressType = $("#" + this.facetWithName("addresstypes")[0]).data("value").toString();
             var country = $("#" + this.facetWithName("countries")[0]).data("value").toString();
             var bounds = this.facetWidgets["bbox"].getActiveValue();
             var n = 180;
@@ -2266,7 +2281,7 @@ module PIC {
                 var height;
                 // point has no real height
                 if (p[6] === undefined) {
-                    var latlonHash = p[0]+","+p[1];
+                    var latlonHash = p[0] + "," + p[1];
                     if (this.latlonHeightHash[latlonHash] === undefined) {
                         height = this.heightDelta;
                     } else {
@@ -2280,25 +2295,25 @@ module PIC {
                 this.elasticResults.total++;
                 this.expandBounds(p);
                 var pt = this.points.add({
-                    id: "P_"+p[2],
-                    position : Cesium.Cartesian3.fromDegrees(p[1], p[0], height),
+                    id: "P_" + p[2],
+                    position: Cesium.Cartesian3.fromDegrees(p[1], p[0], height),
                     color: this.addressTypePalette[p[4]],//new Cesium.Color(1, 0.01, 0.01, 1),
-                    pixelSize : this.pixelSize,
-                    scaleByDistance : new Cesium.NearFarScalar(1.0e1, this.farScale, 1.0e10, this.nearScale)
+                    pixelSize: this.pixelSize,
+                    scaleByDistance: new Cesium.NearFarScalar(1.0e1, this.farScale, 1.0e10, this.nearScale)
                 });
                 pt.originalLatlon = p[0] + "," + p[1] + (p[6] ? "," + p[6] : "");
             }
             this.updateTotals(-1);
         }
 
-        expandBounds (p) {
+        expandBounds(p) {
             if (p[1] > this.bounds[0]) this.bounds[0] = p[1] + this.padding;
             if (p[0] > this.bounds[1]) this.bounds[1] = p[0] + this.padding;
             if (p[1] < this.bounds[2]) this.bounds[2] = p[1] - this.padding;
             if (p[0] < this.bounds[3]) this.bounds[3] = p[0] - this.padding;
         }
 
-        removePoints () {
+        removePoints() {
             this.resetBounds();
             this.points.removeAll();
             this.removeLines();
@@ -2306,11 +2321,11 @@ module PIC {
             this.heightHash = {};
         }
 
-        removeLines () {
+        removeLines() {
             if (this.hasWebGL) this.scene.primitives.remove(this.lines);
         }
 
-        resetDateQuery () {
+        resetDateQuery() {
             var from = $("#" + this.fromDateElement);
             var to = $("#" + this.toDateElement);
             from.val(this.minYear.toString());
@@ -2318,13 +2333,13 @@ module PIC {
             this.updateFilter("date", "*");
         }
 
-        resetNameQuery () {
+        resetNameQuery() {
             var el = $("#" + this.nameQueryElement)
             el.val("");
             this.updateFilter(this.nameQueryElement, "*");
         }
 
-        validateYear (element, defaultValue) {
+        validateYear(element, defaultValue) {
             var el = $("#" + element);
             var str = el.val().trim();
             if (str === "") {
@@ -2339,7 +2354,7 @@ module PIC {
             return year;
         }
 
-        updateTimeFilters () {
+        updateTimeFilters() {
             var from = this.validateYear(this.fromDateElement, this.minYear);
             var to = this.validateYear(this.toDateElement, this.maxYear);
             var value = "*";
@@ -2349,7 +2364,7 @@ module PIC {
             this.updateFilter("date", value);
         }
 
-        humanizeFilters () {
+        humanizeFilters() {
             /*
             template:
             0  Birth
@@ -2493,7 +2508,7 @@ module PIC {
             return text;
         }
 
-        updateNameFilter () {
+        updateNameFilter() {
             var str = $("#" + this.nameQueryElement).val().trim();
             if (str !== "") {
                 var isNumeric = !isNaN(Number(str));
@@ -2524,7 +2539,7 @@ module PIC {
             }
         }
 
-        onToDateKeyUp (e) {
+        onToDateKeyUp(e) {
             var el = e.target;
             if (e.keyCode === 13) {
                 this.updateTimeFilters();
@@ -2553,11 +2568,11 @@ module PIC {
             this.applyFilters();
         }
 
-        onCameraMoved (event:Cesium.Event) {
+        onCameraMoved(event: Cesium.Event) {
             // console.log("moved",this.camera.position);
         }
 
-        changeViewTo (mode) {
+        changeViewTo(mode) {
             if (!this.hasWebGL) return
             if (mode !== Number(this.scene.mode)) {
                 switch (mode) {
@@ -2574,7 +2589,7 @@ module PIC {
             }
         }
 
-        initListeners () {
+        initListeners() {
             this.resetNameQuery();
             this.resetDateQuery();
             var from = $("#" + this.fromDateElement);
@@ -2588,27 +2603,27 @@ module PIC {
             name.blur(() => this.updateNameFilter());
             $("#facets-clear").click(() => this.clearFilters());
             if (!this.hasWebGL) return
-            this.scene.morphComplete.addEventListener( () => {
+            this.scene.morphComplete.addEventListener(() => {
                 if (this.scene.mode !== 2) {
                     this.hideMoon();
                 } else {
                     this.showMoon();
                 }
                 var url = this.buildQueryString();
-                Historyjs.pushState({ignore:true,mode:this.scene.mode}, "PIC - Photographers’ Identities Catalog", url);
+                Historyjs.pushState({ ignore: true, mode: this.scene.mode }, "PIC - Photographers’ Identities Catalog", url);
                 this.updateTextLabels();
                 this.viewer.sceneModePicker.viewModel.dropDownVisible = true;
             });
-            this.camera.moveEnd.addEventListener( () => {
+            this.camera.moveEnd.addEventListener(() => {
                 this.storedView.save(this.camera);
                 this.viewer.sceneModePicker.viewModel.dropDownVisible = true;
                 // console.log(JSON.stringify(this.storedView));
             })
-            this.viewer.geocoder.viewModel.search.afterExecute.addEventListener(() => {this.notifyRepaintRequired()});
+            this.viewer.geocoder.viewModel.search.afterExecute.addEventListener(() => { this.notifyRepaintRequired() });
             // this.camera.moveEnd.addEventListener(() => this.onCameraMoved());
         }
 
-        notifyRepaintRequired () {
+        notifyRepaintRequired() {
             // console.log("repaint");
             if (!this.hasWebGL) return
             if (this.verboseRendering && !this.viewer.useDefaultRenderLoop) {
@@ -2619,7 +2634,7 @@ module PIC {
             this.viewer.useDefaultRenderLoop = true;
         }
 
-        postRender () {
+        postRender() {
             // We can safely stop rendering when:
             //  - the camera position hasn't changed in over a second,
             //  - there are no tiles waiting to load, and

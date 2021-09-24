@@ -16,6 +16,7 @@ PUT https://[FQDN new index]:9243/pic/
 
 2. Close index:
   a. Enable `cluster.indices.close.enable: true` via Console > pic-2019 > Edit > User Overrides
+
   b. `POST https://[FQDN new index]:9243/pic/_close`
 
 3. Put settings:
@@ -235,7 +236,9 @@ PUT https://[FQDN new index]:9243/pic/_mapping/constituent
 }
 ```
 
-## 4. Disable (remove) `cluster.indices.close.enable: true` via Console > pic-2019 > Edit > User Overrides
+## 4. Disable (remove) `cluster.indices.close.enable: true`
+
+Via Console > pic-2019 > Edit > User Overrides
 
 ## 5. Reindex data
 

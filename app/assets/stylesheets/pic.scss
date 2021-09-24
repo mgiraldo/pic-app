@@ -124,6 +124,18 @@ hr {
     }
 }
 
+#bbox-div {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+
+    &.active {
+        z-index: 1;
+    }
+}
+
 #cesiumContainer {
     background-color: $black;
     position: absolute;
@@ -174,7 +186,7 @@ hr {
     transition-timing-function: ease-in;
 
     #facets {
-        overflow-y: scroll;
+        overflow-y: auto;
         -webkit-overflow-scrolling: touch;
         flex: auto;
 
