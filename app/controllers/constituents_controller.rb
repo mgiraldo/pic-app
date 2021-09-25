@@ -26,32 +26,42 @@ class ConstituentsController < ApplicationController
       p = params
       @letter = p[:letter] == nil ? "a" : p[:letter].downcase
       @page = p[:page] == nil ? 1 : p[:page].to_i
+      # q = {
+      #   "query": {
+      #     "span_first": {
+      #       "match": {
+      #         "span_multi": {
+      #           "match": {
+      #             "prefix": {
+      #               "nameSort": {
+      #                 "value": "#{@letter}"
+      #               }
+      #             }
+      #           }
+      #         }
+      #       },
+      #       "end": 1
+      #     }
+      #   }
+      # }
       q = {
         "query": {
-          "span_first": {
-            "match": {
-              "span_multi": {
-                "match": {
-                  "prefix": {
-                    "nameSort": {
-                      "value": "#{@letter}"
-                    }
+            "prefix": {
+                "nameSort": {
+                    "value": "#{@letter}"
                   }
-                }
               }
-            },
-            "end": 1
           }
-        }
       }
       # puts "#{@page} ---- #{p[:page]}"
       size = 1000
       from = (@page - 1) * size
       source = "AlphaSort,ConstituentID,DisplayDate"
-      type = "constituent"
       sort = "AlphaSort.raw:asc"
-      r = client.search index: 'pic', type: type, body: q, size: size, from: from, sort: sort, _source: source
-      @total = r["hits"]["total"].to_i
+      r = client.search index: 'pic', body: q, size: size, from: from, sort: sort, _source: source
+      puts JSON.generate(q)
+      puts JSON.generate(r)
+      @total = r["hits"]["total"]["value"].to_i
       @total_pages = (@total.to_f / size.to_f).ceil
     rescue
       @results = nil
@@ -99,14 +109,15 @@ class ConstituentsController < ApplicationController
     if params[:type] != nil
       type = params[:type]
     end
+
     if params[:ConstituentID] != nil
         # looking for a photographer
         begin
             id = params[:ConstituentID]
             qc = {query:{"bool":{must:[{query_string:{query:"((ConstituentID:#{id}))"}}]}}}
-            r = client.search index: 'pic', type: "constituent", body: qc, size: 1
-            qa = {query:{"bool":{must:[{has_parent:{type:"constituent",query:{bool:{must:[{query_string:{query:"(ConstituentID:#{id})"}}]}}}}]}}}
-            ra = client.search index: 'pic', type: "address", body: qa, size: max_address_size
+            r = client.search index: 'pic', body: qc, size: 1
+            qa = {query:{"bool":{must:[{has_parent:{parent_type:"constituent",query:{bool:{must:[{query_string:{query:"(ConstituentID:#{id})"}}]}}}}]}}}
+            ra = client.search index: 'pic', body: qa, size: max_address_size
             temp = r["hits"]["hits"]
             temp[0]["address"] = ra["hits"]["hits"].map {|a| a["_source"]}
         rescue
@@ -121,7 +132,7 @@ class ConstituentsController < ApplicationController
             source = params[:source]
             exclude = params[:source_exclude]
             sort = "AlphaSort.raw:asc"
-            r = client.search index: 'pic', type: "constituent", body: q, size: max_export_size, from: from, sort: sort, _source: source, _source_exclude: exclude, filter_path: filter_path
+            r = client.search index: 'pic', body: q, size: max_export_size, from: from, sort: sort, _source: source, _source_excludes: exclude, filter_path: filter_path
         rescue
           @results = nil
         end
@@ -129,14 +140,14 @@ class ConstituentsController < ApplicationController
         temp = r["hits"]["hits"]
         temp.each_with_index do |hit, index|
             q_address = {"query" => {"bool" => {"must" => [{"query_string" => {"query" => "ConstituentID:#{hit["_source"]["ConstituentID"]}"}}]}}}
-            address_query = client.search index: 'pic', type: 'address', body: q_address, size: 5000
-            if address_query["hits"]["total"] > 0
+            address_query = client.search index: 'pic', body: q_address, size: 5000
+            if address_query["hits"]["total"]["value"] > 0
                 # puts address_query
                 temp[index]["address"] = address_query["hits"]["hits"]
             end
         end
     end
-    if r && r["hits"]["total"] > 0
+    if r && r["hits"]["total"]["value"] > 0
       if type == "json"
         @results = temp
       elsif type == "geojson"
@@ -164,12 +175,12 @@ class ConstituentsController < ApplicationController
     client = Elasticsearch::Client.new host: connection_string
     max_address_size = 10000 # how many child addresses for a constituent
     begin
-      # results = client.search index: 'pic', q: "constituent.ConstituentID:#{params[:id]}"
       id = params[:id]
       qc = {query:{"bool":{must:[{query_string:{query:"((ConstituentID:#{id}))"}}]}}}
-      r = client.search index: 'pic', type: "constituent", body: qc, size: 1
-      qa = {query:{"bool":{must:[{has_parent:{type:"constituent",query:{bool:{must:[{query_string:{query:"(ConstituentID:#{id})"}}]}}}}]}}}
-      ra = client.search index: 'pic', type: "address", body: qa, size: max_address_size
+      r = client.search index: 'pic', body: qc, size: 1
+      qa = {query:{"bool":{must:[{has_parent:{parent_type:"constituent",query:{bool:{must:[{query_string:{query:"(ConstituentID:#{id})"}}]}}}}]}}}
+      ra = client.search index: 'pic', body: qa, size: max_address_size
+      # puts r
       @constituent = r["hits"]["hits"][0]["_source"]
       @constituent["address"] = ra["hits"]["hits"].map {|a| a["_source"]}
     rescue
@@ -182,7 +193,7 @@ class ConstituentsController < ApplicationController
             wikidata_url = biography["URL"]
             wikidata_id = wikidata_url.sub "https://www.wikidata.org/wiki/", ""
             source_url = "https://www.wikidata.org/w/api.php?action=wbgetclaims&entity=#{wikidata_id}&property=P18&format=json"
-            image_json = JSON.load(open(source_url))
+            image_json = JSON.load(URI.open(source_url))
             image_file = image_json["claims"]["P18"][0]["mainsnak"]["datavalue"]["value"].gsub " ", "_"
             image_md5 = Digest::MD5.hexdigest image_file
             image_url = "https://upload.wikimedia.org/wikipedia/commons/#{image_md5[0]}/#{image_md5[0..1]}/#{image_file}"
