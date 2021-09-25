@@ -61,13 +61,13 @@ GEM
     concurrent-ruby (1.1.9)
     crass (1.0.6)
     debug_inspector (1.1.0)
-    elasticsearch (5.0.4)
-      elasticsearch-api (= 5.0.4)
-      elasticsearch-transport (= 5.0.4)
-    elasticsearch-api (5.0.4)
+    elasticsearch (7.15.0)
+      elasticsearch-api (= 7.15.0)
+      elasticsearch-transport (= 7.15.0)
+    elasticsearch-api (7.15.0)
       multi_json
-    elasticsearch-transport (5.0.4)
-      faraday
+    elasticsearch-transport (7.15.0)
+      faraday (~> 1)
       multi_json
     erubis (2.7.0)
     execjs (2.8.1)
@@ -264,7 +264,7 @@ DEPENDENCIES
   bourbon
   byebug
   coffee-rails (~> 4.1.0)
-  elasticsearch (= 5.0.4)
+  elasticsearch (~> 7.15)
   google-api-client
   google_drive (= 1.0.2)
   jbuilder (~> 2.0)

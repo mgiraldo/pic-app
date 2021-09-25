@@ -10,7 +10,7 @@ class ConstituentsController < ApplicationController
   def map
     require 'open-uri'
     @admin = params[:admin] != nil
-    @min_year = open("#{ENV['CLOUDFRONT_URL']}csv/minyear.txt"){|f| f.read}
+    @min_year = URI.open("#{ENV['CLOUDFRONT_URL']}csv/minyear.txt"){|f| f.read}
     @min_year = @min_year.to_i
   end
 
@@ -77,10 +77,11 @@ class ConstituentsController < ApplicationController
       from = p[:from].to_i
       size = p[:size].to_i
       source = p[:source]
-      type = p[:docType]
       exclude = p[:source_exclude]
       sort = p[:sort]
-      r = client.search index: 'pic', type: type, body: q, size: size, from: from, sort: sort, _source: source, _source_exclude: exclude, filter_path: filter_path
+      r = client.search index: 'pic', body: q, size: size, from: from, sort: sort, _source: source, _source_excludes: exclude, filter_path: filter_path
+      # puts r
+      # puts "\n\n\n\n\n"
     rescue
       @results = nil
     end
