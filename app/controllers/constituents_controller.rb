@@ -59,8 +59,8 @@ class ConstituentsController < ApplicationController
       source = "AlphaSort,ConstituentID,DisplayDate"
       sort = "AlphaSort.raw:asc"
       r = client.search index: 'pic', body: q, size: size, from: from, sort: sort, _source: source
-      puts JSON.generate(q)
-      puts JSON.generate(r)
+      # puts JSON.generate(q)
+      # puts JSON.generate(r)
       @total = r["hits"]["total"]["value"].to_i
       @total_pages = (@total.to_f / size.to_f).ceil
     rescue
