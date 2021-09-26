@@ -67,8 +67,9 @@ class ConstituentsController < ApplicationController
       @results = nil
     end
     # puts "QUERY:"
-    # puts q
-    @results = r
+    puts JSON.generate(r)
+    r["hits"]["hits"] = r["hits"]["hits"].sort_by{|s| s["_source"]["AlphaSort"]}
+    @results = r #
     respond_with @results do |f|
       f.html # {render json: @constituent}
       f.json {render json: @results}
