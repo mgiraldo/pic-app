@@ -139,7 +139,7 @@ class ConstituentsController < ApplicationController
         # puts "type: #{params} |#{params[:type]==nil}|"
         temp = r["hits"]["hits"]
         temp.each_with_index do |hit, index|
-            q_address = {"query" => {"bool" => {"must" => [{"query_string" => {"query" => "ConstituentID:#{hit["_source"]["ConstituentID"]}"}}]}}}
+            q_address = {query: {bool: {must: [{has_parent: {parent_type: "constituent", query: {bool: {must: [{query_string: {query: "ConstituentID:#{hit["_source"]["ConstituentID"]}"}}]}}}}]}}}
             address_query = client.search index: 'pic', body: q_address, size: 5000
             if address_query["hits"]["total"]["value"] > 0
                 # puts address_query
