@@ -26,49 +26,41 @@ class ConstituentsController < ApplicationController
       p = params
       @letter = p[:letter] == nil ? "a" : p[:letter].downcase
       @page = p[:page] == nil ? 1 : p[:page].to_i
-      # q = {
-      #   "query": {
-      #     "span_first": {
-      #       "match": {
-      #         "span_multi": {
-      #           "match": {
-      #             "prefix": {
-      #               "nameSort": {
-      #                 "value": "#{@letter}"
-      #               }
-      #             }
-      #           }
-      #         }
-      #       },
-      #       "end": 1
-      #     }
-      #   }
-      # }
       q = {
         "query": {
-            "prefix": {
-                "nameSort": {
-                    "value": "#{@letter}"
+          "span_first": {
+            "match": {
+              "span_multi": {
+                "match": {
+                  "prefix": {
+                    "nameSort": {
+                      "value": "#{@letter}"
+                    }
                   }
+                }
               }
+            },
+            "end": 1
           }
+        }
       }
       # puts "#{@page} ---- #{p[:page]}"
       size = 1000
       from = (@page - 1) * size
       source = "AlphaSort,ConstituentID,DisplayDate"
-      sort = "AlphaSort.raw:asc"
+      sort = "nameSort:asc"
       r = client.search index: 'pic', body: q, size: size, from: from, sort: sort, _source: source
+      r["hits"]["hits"] = r["hits"]["hits"].sort_by{|s| s["_source"]["nameSort"]}
       # puts JSON.generate(q)
       # puts JSON.generate(r)
-      @total = r["hits"]["total"]["value"].to_i
+      count_r = client.count body: q
+      @total = count_r["count"].to_i
       @total_pages = (@total.to_f / size.to_f).ceil
     rescue
       @results = nil
     end
     # puts "QUERY:"
-    puts JSON.generate(r)
-    r["hits"]["hits"] = r["hits"]["hits"].sort_by{|s| s["_source"]["AlphaSort"]}
+    # puts JSON.generate(r)
     @results = r #
     respond_with @results do |f|
       f.html # {render json: @constituent}

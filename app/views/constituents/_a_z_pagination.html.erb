@@ -1,0 +1,11 @@
+<ul class="pagination">
+<% if @total_pages > 1 && @page > 1 %>
+  <li><%= link_to "< Previous", "/constituents/a-z/#{@letter}/page/#{@page - 1}" %></li>
+<% end %>
+<% (1..@total_pages).each do |p| %>
+  <li><%= link_to_unless_current "#{p}", "/constituents/a-z/#{@letter}/page/#{p}" %></li>
+<% end %>
+<% if @total_pages > 1 && @page < @total_pages %>
+  <li><%= link_to "Next >", "/constituents/a-z/#{@letter}/page/#{@page + 1}" %></li>
+<% end %>
+</ul>

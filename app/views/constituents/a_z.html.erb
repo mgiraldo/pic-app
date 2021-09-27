@@ -5,6 +5,9 @@
 <% if @results != nil %>
 <main>
 <ul class="pagination letter">
+  <li>
+    <%= link_to_unless_current "4", "/constituents/a-z/4" %>
+  </li>
 <% ('A'..'Z').each do |l| %>
   <li>
     <%= link_to_unless_current "#{l}", "/constituents/a-z/#{l.downcase}" %>
@@ -19,11 +22,7 @@
 
 <% if (@total_pages > 1) %>
 <aside>
-<ul class="pagination">
-<% (1..@total_pages).each do |p| %>
-  <li><%= link_to_unless_current "#{p}", "/constituents/a-z/#{@letter}/page/#{p}" %></li>
-<% end %>
-</ul>
+<%= render :partial => "a_z_pagination", letter: @letter, page: @page %>
 </aside>
 <% end %>
 
@@ -38,11 +37,7 @@
 
 <% if (@total_pages > 1) %>
 <aside>
-<ul class="pagination">
-<% (1..@total_pages).each do |p| %>
-  <li><%= link_to_unless_current "#{p}", "/constituents/a-z/#{@letter}/page/#{p}" %></li>
-<% end %>
-</ul>
+<%= render :partial => "a_z_pagination", letter: @letter, page: @page %>
 </aside>
 <% end %>
 
