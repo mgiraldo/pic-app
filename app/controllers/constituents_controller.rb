@@ -1,7 +1,7 @@
 class ConstituentsController < ApplicationController
 
   respond_to :html, :json
-  skip_before_filter :verify_authenticity_token, only: [:search]
+  skip_before_action :verify_authenticity_token, only: [:search]
 
 
   def index
