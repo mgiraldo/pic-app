@@ -50,7 +50,6 @@ class ConstituentsController < ApplicationController
       source = "AlphaSort,ConstituentID,DisplayDate"
       sort = "nameSort:asc"
       r = client.search index: 'pic', body: q, size: size, from: from, sort: sort, _source: source
-      r["hits"]["hits"] = r["hits"]["hits"].sort_by{|s| s["_source"]["nameSort"]}
       # puts JSON.generate(q)
       # puts JSON.generate(r)
       count_r = client.count body: q
@@ -83,6 +82,12 @@ class ConstituentsController < ApplicationController
       exclude = p[:source_exclude]
       sort = p[:sort]
       r = client.search index: 'pic', body: q, size: size, from: from, sort: sort, _source: source, _source_excludes: exclude, filter_path: filter_path
+      # puts "\n\n\n\n\n"
+      # puts JSON.generate(q)
+      # puts "\n\n\n\n\n"
+      count_r = client.count body: {query: q[:query]}
+      @total = count_r["count"].to_i
+      r["hits"]["total"]["value"] = @total
       # puts r
       # puts "\n\n\n\n\n"
     rescue
@@ -124,7 +129,7 @@ class ConstituentsController < ApplicationController
             from = 0
             source = params[:source]
             exclude = params[:source_exclude]
-            sort = "AlphaSort.raw:asc"
+            sort = "nameSort:asc"
             r = client.search index: 'pic', body: q, size: max_export_size, from: from, sort: sort, _source: source, _source_excludes: exclude, filter_path: filter_path
         rescue
           @results = nil
@@ -170,6 +175,7 @@ class ConstituentsController < ApplicationController
     begin
       id = params[:id]
       qc = {query:{"bool":{must:[{query_string:{query:"((ConstituentID:#{id}))"}}]}}}
+      # puts JSON.generate(qc)
       r = client.search index: 'pic', body: qc, size: 1
       qa = {query:{"bool":{must:[{has_parent:{parent_type:"constituent",query:{bool:{must:[{query_string:{query:"(ConstituentID:#{id})"}}]}}}}]}}}
       ra = client.search index: 'pic', body: qa, size: max_address_size

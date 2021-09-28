@@ -789,7 +789,7 @@ module PIC {
             // constituent aggs
             var data = this.buildElasticQuery(["ConstituentID:*"], ["*"], "parent")
             this.getData({
-                filters: filters, data: data, sort: "", source: "", size: 0, callback: function (results) {
+                filters: filters, data: data, source: "", size: 0, callback: function (results) {
                     if (results.aggregations) {
                         this.applyAggregations(results.aggregations)
                     }
@@ -824,22 +824,13 @@ module PIC {
             r.send();
         }
 
-        getData({ filters, data, callback, source, size = this.elasticSize, exclude = "", from = 0, parameter = undefined, docType = "constituent", sort = "AlphaSort.raw:asc", after = [] }) {
+        getData({ filters, data, callback, source, size = this.elasticSize, exclude = "", from = 0, parameter = undefined, sort = "nameSort:asc", after = [] }) {
             var hasName = (this.buildFacetList().map(a => a.indexOf("DisplayName:") != -1)).indexOf(true) != -1;
             // console.log(hasName);
             if (hasName) {
                 sort = "_score," + sort;
             }
-            if (after.length) {
-                data["search_after"] = after
-            }
-            var url = this.baseUrl //+ "?docType=" + docType + "&sort=" + sort;
-            // url = url + "&filter_path="+filters;
-            // url = url + "&size="+size;
-            // url = url + "&from="+from;
-            // url = url + "&_source="+source;
-            // url = url + "&_source_exclude="+exclude;
-            // console.log(data);
+            var url = this.baseUrl;
             var pic = this;
 
             var r = new XMLHttpRequest();
@@ -866,7 +857,6 @@ module PIC {
                 "size": size,
                 "from": from,
                 "source": source,
-                "docType": docType,
                 "sort": sort,
                 "source_exclude": exclude
             }
@@ -1712,7 +1702,7 @@ module PIC {
             // change url without commiting new state change
             var filters = "hits.total,hits.hits";
             var data = this.buildElasticQuery(["ConstituentID:" + id, "address.ConstituentID:" + id], ["*"], "parent");
-            this.getData({ filters: filters, data: data, callback: this.parseConstituentAddresses, source: "", size: this.elasticSize, exclude: "", sort: "", from: 0, parameter: id });
+            this.getData({ filters: filters, data: data, callback: this.parseConstituentAddresses, source: "", size: this.elasticSize, exclude: "", from: 0, parameter: id });
         }
 
         parseConstituentAddresses(data, id) {
@@ -1892,7 +1882,7 @@ module PIC {
                     html += data.hits.hits[0]._source.DisplayName
                     html += '</div>'
                     $("#total-points").append(html)
-                }, source: "DisplayName", size: 1, exclude: "", sort: "", from: 0
+                }, source: "DisplayName", size: 1, exclude: "", from: 0
             })
         }
 
@@ -2115,7 +2105,7 @@ module PIC {
             if (facetList.length === 0) {
                 this.displayBaseData();
             } else {
-                this.getData({ filters: filters, data: data, callback: this.getNextSet, sort: "", source: "ConAddressID" });
+                this.getData({ filters: filters, data: data, callback: this.getNextSet, source: "ConAddressID" });
             }
             this.updateTotals(-1);
         }
@@ -2145,12 +2135,13 @@ module PIC {
             if (results.aggregations) {
                 this.applyAggregations(results.aggregations)
             }
+            console.log(results.hits.total.value , this.elasticResults.from , this.elasticSize)
             if (results.hits.total.value > this.elasticResults.from + this.elasticSize) {
                 // keep going
                 var data = this.elasticResults.data;
                 this.elasticResults.from += this.elasticSize;
                 var filters = this.elasticResults.filters;
-                this.getData({ filters: filters, data: data, callback: this.getNextSet, sort: "", source: "ConAddressID", size: this.elasticSize, exclude: "", from: 0, after: ["address#" + results.hits.hits[results.hits.hits.length - 1]._id] });
+                this.getData({ filters: filters, data: data, callback: this.getNextSet, source: "ConAddressID", size: this.elasticSize, exclude: "", from:this.elasticResults.from, after: ["address#" + results.hits.hits[results.hits.hits.length - 1]._id] });
             } else {
                 var end = new Date().getTime();
                 var time = end - this.start;
@@ -2250,18 +2241,6 @@ module PIC {
                 var index = this.pointHash[newPoints[i]];
                 var p = this.pointArray[index];
                 if (!p) continue;
-                // // hack, because elastic returns all addresses of a given id
-                // var tid = p[4];
-                // var cid = p[5];
-                // var loc = p[0] + "," + p[1];
-                // // console.log("type",addressType, tid, tid != addressType);
-                // if (addressType != "*" && tid != addressType) continue;
-                // // console.log("country",country, cid, cid != country);
-                // if (country != "*" && cid != country) continue;
-                // // console.log("latlon", w, e, s, n, "p", p, w <= p[0], e >= p[0], n >= p[1], s <= p[1]);
-                // if (!(w <= p[0] && e >= p[0] && n >= p[1] && s <= p[1])) continue;
-                // // console.log("yea");
-                // // end hack
                 var height;
                 // point has no real height
                 if (p[6] === undefined) {
@@ -2373,7 +2352,6 @@ module PIC {
             var facet;
             var facetKey;
             var key;
-            var hasQualifier = false;
 
             // addresstype
             facet = this.facets[0];
