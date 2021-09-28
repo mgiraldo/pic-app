@@ -2135,7 +2135,7 @@ module PIC {
             if (results.aggregations) {
                 this.applyAggregations(results.aggregations)
             }
-            console.log(results.hits.total.value , this.elasticResults.from , this.elasticSize)
+            // console.log(results.hits.total.value , this.elasticResults.from , this.elasticSize)
             if (results.hits.total.value > this.elasticResults.from + this.elasticSize) {
                 // keep going
                 var data = this.elasticResults.data;
