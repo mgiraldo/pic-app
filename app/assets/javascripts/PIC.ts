@@ -1910,7 +1910,7 @@ module PIC {
             if (facet[0] !== "bbox") {
                 // hack for ignoring the bbox (has no csv)
                 // var url = this.rootPath + "" + facet[0] + ".csv?i=" + Math.round(Math.random() * 100000000);
-                var url = this.rootPath + "" + facet[0] + ".csv?1=1";
+                var url = this.rootPath + "" + facet[0] + ".csv?a=3";
                 this.loadTextFile(url, this.updateFacet, facet);
             } else {
                 this.initFacetWidget(widget);
