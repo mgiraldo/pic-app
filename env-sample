@@ -1,7 +1,7 @@
 ELASTIC_HOST=[fqdn es server]:9243
 ELASTIC_PASSWORD=[es pw]
 ELASTIC_USER=[es user]
-CLOUDFRONT_URL=http://[fqdn cf url]/
+GH_PAGES_URL=http://[fqdn gh pages prefix url]/
 PROTOCOL=https://
 RAILS_ENV=development
 GOOGLE_EMAIL=[email for feedback]

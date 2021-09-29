@@ -10,7 +10,7 @@ class ConstituentsController < ApplicationController
   def map
     require 'open-uri'
     @admin = params[:admin] != nil
-    @min_year = URI.open("#{ENV['CLOUDFRONT_URL']}csv/minyear.txt"){|f| f.read}
+    @min_year = URI.open("#{ENV['GH_PAGES_URL']}minyear.txt"){|f| f.read}
     @min_year = @min_year.to_i
   end
 
