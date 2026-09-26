@@ -1,19 +1,14 @@
 source 'https://rubygems.org'
 
-ruby '2.7.4'
+ruby '3.3.9'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'actionpack'
-gem 'actionview'
-gem 'actionmailer'
-gem 'activejob'
-gem 'activesupport'
-gem 'railties', '~> 5.2.6'
+gem 'rails', '~> 8.1'
 gem 'sprockets-rails'
 # Use sqlite3 as the database for Active Record
 # gem 'pg', '~> 0.11'
 # Use SCSS for stylesheets
-gem 'sass-rails', '~> 5.0'
+gem 'sass-rails', '~> 6.0'
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
 # Use CoffeeScript for .coffee assets and views
@@ -41,17 +36,17 @@ gem 'unicorn'
 
 gem 'markdown-rails', '1.0.0'
 
-gem 'responders', '~> 2.0'
+gem 'responders'
 
 gem 'elasticsearch', '~> 7.15'
 
 gem 'google_drive', '1.0.2'
 gem 'google-api-client'#, '~> 0.7.0'
+gem 'faraday', '~> 1.0'
 gem 'useragent'
 
-gem 'bourbon'
-gem 'neat', '4.0.0'
-gem 'typescript-rails'
+gem 'bourbon', '~> 7.3'
+gem 'typescript-rails', require: false
 
 gem 'rails_12factor', group: :production
 

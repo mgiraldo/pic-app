@@ -1,25 +1,27 @@
 @import "bourbon";
-@import "neat";
 @import "css3-mixins";
 @import "variables";
 @import "grid-settings";
 
 @keyframes starwars {
-  0% {
-    background-position: 50% 300%;
-  }
-  100% {
-    background-position: 50% 0%;
-  }
+    0% {
+        background-position: 50% 300%;
+    }
+
+    100% {
+        background-position: 50% 0%;
+    }
 }
 
-html, body {
+html,
+body {
     margin: 0 0 100px;
     padding: 0;
     font-family: $bodyFont;
     font-size: 18px;
     line-height: 1.75em;
     background: $white;
+
     @include media($tablet) {
         font-size: 24px;
     }
@@ -90,7 +92,8 @@ p {
         width: 300px;
     }
 
-    &:link, &:visited {
+    &:link,
+    &:visited {
         background-color: $linkColor;
         color: $white;
     }
@@ -127,7 +130,11 @@ p {
     }
 }
 
-#intro, #samples, #how-to, #faq, #background {
+#intro,
+#samples,
+#how-to,
+#faq,
+#background {
     h3 {
         // @include span-columns(10);
         // @include grid-shift(1);
@@ -202,7 +209,8 @@ p {
                     width: 240px;
                 }
 
-                &:link, &:visited {
+                &:link,
+                &:visited {
                     background-color: $linkColor;
                     color: $white;
                 }
@@ -254,6 +262,7 @@ p {
         // @include span-columns(10);
         margin-left: 20rem;
         width: 60%;
+
         @include media($tablet) {
             // @include grid-shift(2);
             margin-left: auto;
@@ -310,7 +319,8 @@ p {
     }
 }
 
-.main-header, .footer {
+.main-header,
+.footer {
     // @include span-columns(12);
 }
 
@@ -361,7 +371,11 @@ p {
 }
 
 .wrap {
-    &-sample, &-how, &-faq, &-background {
+
+    &-sample,
+    &-how,
+    &-faq,
+    &-background {
         margin: 1em 0 5em;
         padding: 0 0 2em;
     }
@@ -397,7 +411,9 @@ header {
         font-size: 12px;
     }
 
-    a:link, a:visited, a:hover {
+    a:link,
+    a:visited,
+    a:hover {
         color: $white;
     }
 }
@@ -410,45 +426,45 @@ header {
 }
 
 #footer {
-  margin: 20em 0 0 0;
-  text-align: center;
-  font-size: 0.8em;
-  line-height: 1.4em;
-  color: $darkGray;
+    margin: 20em 0 0 0;
+    text-align: center;
+    font-size: 0.8em;
+    line-height: 1.4em;
+    color: $darkGray;
 
-  @media screen and (max-width: $mobile-breakpoint) {
-    // margin-left: $radius*2;
-    // margin-right: $radius*2;
-    // text-align: center;
-    // background-color: $bubblecolor;
-    // border-radius: $radius;
-    // padding: $radius;
-  }
-
-  p {
     @media screen and (max-width: $mobile-breakpoint) {
-      width: auto;
+        // margin-left: $radius*2;
+        // margin-right: $radius*2;
+        // text-align: center;
+        // background-color: $bubblecolor;
+        // border-radius: $radius;
+        // padding: $radius;
     }
-  }
 
-  .nypl {
-    color: $black;
-    display: block;
-    margin: 0 auto;
-    width: 200px;
-  }
-
-  .icon-icon_lion {
-    color: $black;
-    display: block;
-
-    &:before {
-      @include drr-icon("\4e");
-      display: block;
-      font-size: 30px;
-      margin-bottom: 5px;
+    p {
+        @media screen and (max-width: $mobile-breakpoint) {
+            width: auto;
+        }
     }
-  }
+
+    .nypl {
+        color: $black;
+        display: block;
+        margin: 0 auto;
+        width: 200px;
+    }
+
+    .icon-icon_lion {
+        color: $black;
+        display: block;
+
+        &:before {
+            @include drr-icon("\4e");
+            display: block;
+            font-size: 30px;
+            margin-bottom: 5px;
+        }
+    }
 
     @include media($tablet) {
         font-size: 0.5em;
@@ -537,8 +553,8 @@ header {
             //  color: $gray;
             // }
             @media screen and (min-width: 0px) and (max-width: $mobile-breakpoint) {
-             // font-size: 14px;
-             padding: 3px; 
+                // font-size: 14px;
+                padding: 3px;
             }
         }
     }
@@ -546,8 +562,7 @@ header {
     #feedback-form {
         margin: 10px;
 
-        @media screen and (min-width: 0px) and (max-width: $mobile-breakpoint) {
-        }
+        @media screen and (min-width: 0px) and (max-width: $mobile-breakpoint) {}
 
         h2 {
             font-size: 20px;
@@ -632,7 +647,7 @@ header {
         top: 0;
         bottom: 0;
         right: 0;
-        background-color: rgba(0,0,0,0.75);
+        background-color: rgba(0, 0, 0, 0.75);
         color: $white;
         text-align: center;
         line-height: 260px;
@@ -695,7 +710,9 @@ section {
         }
     }
 
-    .bio, ul, .locations {
+    .bio,
+    ul,
+    .locations {
         grid-column: 2 / 7;
 
         @include media ($tablet) {
@@ -712,99 +729,97 @@ section {
 }
 
 .locations {
-  display: grid;
-  grid-gap: 1rem;
-  grid-template-columns: repeat(6, 1fr);
+    display: grid;
+    grid-gap: 1rem;
+    grid-template-columns: repeat(6, 1fr);
 
-  @include media ($tablet) {
-    grid-template-columns: 1fr;
-  }
+    @include media ($tablet) {
+        grid-template-columns: 1fr;
+    }
 
-  .address {
+    .address {}
 
-  }
+    h4 {
+        font-family: $headerFont;
+        line-height: 1.25;
+    }
 
-  h4 {
-    font-family: $headerFont;
-    line-height: 1.25;
-  }
-
-  p {
-    line-height: 1.25;
-    grid-column: 1 / 7;
-
-      @include media ($tablet) {
-        grid-column: 1;
-      }
-  }
-
-  .map {
-    background-color: $gray;
-
-    img {
-        width: 100%;
+    p {
+        line-height: 1.25;
+        grid-column: 1 / 7;
 
         @include media ($tablet) {
-          max-width: 200px;
+            grid-column: 1;
         }
     }
-  }
+
+    .map {
+        background-color: $gray;
+
+        img {
+            width: 100%;
+
+            @include media ($tablet) {
+                max-width: 200px;
+            }
+        }
+    }
 }
 
 .pic_id {
-  display: inline-block;
-  width: 5rem;
+    display: inline-block;
+    width: 5rem;
 
-  @include media ($tablet) {
-    width: 4rem;
-  }
+    @include media ($tablet) {
+        width: 4rem;
+    }
 }
 
 .constituent_list {
-  grid-column: 1 / 7;
-  margin: 2rem 0 0 0;
+    grid-column: 1 / 7;
+    margin: 2rem 0 0 0;
 }
 
 .alpha_list {
-  margin: 2rem 0 0 0;
+    margin: 2rem 0 0 0;
 
-  li {
-    margin-bottom: 1rem;
-  }
+    li {
+        margin-bottom: 1rem;
+    }
 }
 
 .pagination {
-  display: flex;
+    display: flex;
 
-  @include media ($tablet) {
-    display: block;
+    @include media ($tablet) {
+        display: block;
+
+        li {
+            display: inline-block;
+        }
+    }
+
+    &::before {
+        content: 'Page: ';
+        display: inline-block;
+        margin: 0 0.5rem 0 0;
+    }
+
+    &.letter::before {
+        content: 'Letter: ';
+        display: inline-block;
+        margin: 0 0.5rem 0 0;
+    }
 
     li {
-      display: inline-block;
+        &::after {
+            content: '|';
+            display: inline-block;
+            margin: 0 0.5rem;
+        }
+
+        &:last-child::after {
+            display: none;
+        }
     }
-  }
-
-  &::before {
-    content: 'Page: ';
-    display: inline-block;
-    margin: 0 0.5rem 0 0;
-  }
-
-  &.letter::before {
-    content: 'Letter: ';
-    display: inline-block;
-    margin: 0 0.5rem 0 0;
-  }
-
-  li {
-    &::after {
-      content: '|';
-      display: inline-block;
-      margin: 0 0.5rem;
-    }
-
-    &:last-child::after {
-      display: none;
-    }
-  }
 }

@@ -14,7 +14,10 @@ require "sprockets/railtie"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
+$LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 Bundler.require(*Rails.groups)
+require 'typescript_rails_compatibility'
+require 'typescript-rails'
 
 module Picfeedback
   class Application < Rails::Application
